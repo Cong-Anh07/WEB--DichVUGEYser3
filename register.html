@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký - Nanogeyser</title>
+    <link rel="icon" href="Logo (1).png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="logo">
+                    <img src="Logo (1).png" alt="Nanogeyser Logo">
+                </div>
+                <h2>Đăng Ký Tài Khoản</h2>
+            </div>
+            
+            <form id="registerForm" class="login-form">
+                <div class="form-group">
+                    <label for="fullName">Họ và tên <span style="color: #dc3545;">*</span></label>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="fullName" name="fullName" required placeholder="Nguyễn Văn A">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Số điện thoại <span style="color: #dc3545;">*</span></label>
+                    <div class="input-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="phone" name="phone" required placeholder="0901 234 567">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="email@example.com">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Địa chỉ</label>
+                    <div class="input-group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="address" name="address" placeholder="Số nhà, đường, quận...">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập <span style="color: #dc3545;">*</span></label>
+                    <div class="input-group">
+                        <i class="fas fa-user-circle"></i>
+                        <input type="text" id="username" name="username" required placeholder="Tên đăng nhập">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mật khẩu <span style="color: #dc3545;">*</span></label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" required placeholder="Tối thiểu 6 ký tự">
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Xác nhận mật khẩu <span style="color: #dc3545;">*</span></label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Nhập lại mật khẩu">
+                        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-options" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+                    <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <span>Tôi đồng ý với <a href="#" style="color: var(--primary-color);">điều khoản dịch vụ</a></span>
+                    </label>
+                    <label class="checkbox-container" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="receiveNews">
+                        <span>Nhận thông báo khuyến mãi qua email/SMS</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary login-btn">
+                    <i class="fas fa-user-plus"></i>
+                    Đăng Ký
+                </button>
+                
+                <div class="register-link">
+                    <p>Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
+                </div>
+            </form>
+        </div>
+        
+        <div class="login-footer">
+            <a href="index.html" class="back-home">
+                <i class="fas fa-arrow-left"></i>
+                Về trang chủ
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.parentElement.querySelector('.toggle-password i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Format phone number
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) value = value.slice(0, 10);
+            
+            if (value.length > 7) {
+                value = value.slice(0, 4) + ' ' + value.slice(4, 7) + ' ' + value.slice(7);
+            } else if (value.length > 4) {
+                value = value.slice(0, 4) + ' ' + value.slice(4);
+            }
+            e.target.value = value;
+        });
+        
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validate password
+            if (password.length < 6) {
+                showAlert('Mật khẩu phải có ít nhất 6 ký tự!', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showAlert('Mật khẩu xác nhận không khớp!', 'error');
+                return;
+            }
+            
+            if (!document.getElementById('agreeTerms').checked) {
+                showAlert('Vui lòng đồng ý với điều khoản dịch vụ!', 'error');
+                return;
+            }
+            
+            // Collect form data
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                username: document.getElementById('username').value,
+                password: password,
+                receiveNews: document.getElementById('receiveNews').checked,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Show loading
+            const submitBtn = document.querySelector('.login-btn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            submitBtn.disabled = true;
+            
+            // Simulate registration
+            setTimeout(() => {
+                // Save user (in real app, send to server)
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                
+                // Check if username exists
+                if (users.find(u => u.username === formData.username)) {
+                    showAlert('Tên đăng nhập đã tồn tại!', 'error');
+                    submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Đăng Ký';
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                users.push(formData);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                showAlert('Đăng ký thành công! Đang chuyển đến trang đăng nhập...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            }, 1500);
+        });
+        
+        // Show alert
+        function showAlert(message, type) {
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) existingAlert.remove();
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+                <span>${message}</span>
+            `;
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                background: ${type === 'error' ? '#dc3545' : '#28a745'};
+                color: white;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                z-index: 9999;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+    </script>
+</body>
+</html>

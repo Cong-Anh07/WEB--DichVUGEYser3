@@ -62,6 +62,8 @@
 
     <script src="config.js"></script>
     <script>
+    let allProducts = []; // Lưu tất cả sản phẩm để filter
+    
     document.addEventListener('DOMContentLoaded', function() {
         const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
         if (!currentUser) {
@@ -86,13 +88,8 @@
                     </a>
                     <div class="dropdown-menu">
                         <a href="booking.html"><i class="fas fa-calendar-plus"></i> Đặt lịch</a>
-                        <div class="dropdown-submenu">
-                            <a href="#" class="submenu-toggle"><i class="fas fa-history"></i> Lịch sử <i class="fas fa-chevron-right submenu-arrow"></i></a>
-                            <div class="submenu">
-                                <a href="history-booking.html"><i class="fas fa-calendar-check"></i> Lịch sử đặt lịch</a>
-                                <a href="history-filter.html"><i class="fas fa-filter"></i> Nhật ký thay lõi</a>
-                            </div>
-                        </div>
+                        <a href="history-booking.html"><i class="fas fa-calendar-check"></i> Lịch sử đặt lịch</a>
+                        <a href="history-filter.html"><i class="fas fa-filter"></i> Nhật ký thay lõi</a>
                         <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
                     </div>
                 </div>
@@ -119,6 +116,8 @@
                     products = result.data.listProducts;
                 }
                 
+                allProducts = products; // Lưu lại để filter
+                
                 if (products.length > 0) {
                     displayProducts(products);
                 } else {
@@ -134,6 +133,45 @@
             });
     }
 
+    function filterByStatus() {
+        const status = document.getElementById('statusFilter').value;
+        
+        if (status === 'all') {
+            displayProducts(allProducts);
+        } else {
+            // Filter các sản phẩm có order_filter_cores với status tương ứng
+            const filtered = allProducts.map(item => {
+                const filterCores = item.order_filter_cores || [];
+                const filteredCores = filterCores.filter(core => core.status === status);
+                return {
+                    ...item,
+                    order_filter_cores: filteredCores
+                };
+            }).filter(item => item.order_filter_cores.length > 0);
+            
+            if (filtered.length > 0) {
+                displayProducts(filtered);
+            } else {
+                document.getElementById('productsList').innerHTML = `
+                    <div class="empty-filter-result">
+                        <i class="fas fa-search"></i>
+                        <p>Không có lịch sử thay lõi với trạng thái "${getStatusText(status)}"</p>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    function getStatusText(status) {
+        const map = {'1': 'Chờ xác nhận', '2': 'Đã xác nhận', '3': 'Hoàn thành'};
+        return map[status] || 'Không xác định';
+    }
+
+    function getStatusClass(status) {
+        const map = {'1': 'pending', '2': 'confirmed', '3': 'completed'};
+        return map[status] || 'pending';
+    }
+
     function displayProducts(products) {
         const container = document.getElementById('productsList');
         container.style.display = 'block';
@@ -143,7 +181,7 @@
             const filterCores = item.order_filter_cores || [];
             
             return `
-            <div class="product-filter-card">
+            <div class="product-filter-card" onclick="window.location.href='product-detail.html?id=${item.id}'" style="cursor:pointer;">
                 <div class="product-header">
                     <div class="product-info">
                         <h3><i class="fas fa-tint"></i> ${product.name || 'Sản phẩm'}</h3>
@@ -156,15 +194,21 @@
                     <h4><i class="fas fa-filter"></i> Lịch sử thay lõi (${filterCores.length} lần)</h4>
                     ${filterCores.length > 0 ? `
                         <div class="filter-list">
-                            ${filterCores.slice(0, 10).map(core => `
+                            ${filterCores.slice(0, 3).map(core => `
                                 <div class="filter-item">
-                                    <span class="filter-name">${core.name || core.filter_core_name || core.ten_loi || 'Lõi lọc'}</span>
-                                    <span class="filter-date">${formatDate(core.replace_date || core.ngay_thay || core.created_at)}</span>
+                                    <div class="filter-info">
+                                        <span class="filter-name">${core.name || core.filter_core_name || core.ten_loi || 'Lõi lọc'}</span>
+                                        <span class="filter-date">${formatDate(core.replace_date || core.ngay_thay || core.created_at)}</span>
+                                    </div>
+                                    <span class="filter-status status-${getStatusClass(core.status)}">${getStatusText(core.status)}</span>
                                 </div>
                             `).join('')}
-                            ${filterCores.length > 10 ? `<p class="more-items">+ ${filterCores.length - 10} lần thay khác</p>` : ''}
+                            ${filterCores.length > 3 ? `<p class="more-items">+ ${filterCores.length - 3} lần thay khác - Click để xem chi tiết</p>` : ''}
                         </div>
                     ` : '<p class="no-filter">Chưa có lịch sử thay lõi</p>'}
+                </div>
+                <div class="card-footer">
+                    <span class="view-detail"><i class="fas fa-eye"></i> Xem chi tiết sản phẩm</span>
                 </div>
             </div>
             `;
@@ -202,6 +246,52 @@
         border-color: #28a745;
     }
     
+    /* Filter toolbar */
+    .filter-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        padding: 15px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .filter-toolbar label {
+        font-weight: 500;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .filter-toolbar label i { color: #28a745; }
+    .status-filter {
+        padding: 10px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        background: white;
+        min-width: 180px;
+        transition: all 0.3s;
+    }
+    .status-filter:focus {
+        outline: none;
+        border-color: #28a745;
+    }
+    .empty-filter-result {
+        text-align: center;
+        padding: 50px 20px;
+        background: white;
+        border-radius: 15px;
+        color: #666;
+    }
+    .empty-filter-result i {
+        font-size: 2.5rem;
+        color: #ccc;
+        margin-bottom: 15px;
+    }
+    
     .loading-state, .empty-state { text-align: center; padding: 60px 20px; }
     .loading-state i, .empty-state i { font-size: 3rem; color: #28a745; margin-bottom: 20px; }
     .empty-state i { color: #ccc; }
@@ -214,6 +304,11 @@
         border-radius: 20px;
         padding: 25px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+    }
+    .product-filter-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
     }
     .product-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
     .product-info h3 { color: #1a1a2e; font-size: 1.2rem; margin-bottom: 8px; }
@@ -240,10 +335,28 @@
         border-radius: 10px;
         border-left: 3px solid #28a745;
     }
+    .filter-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
     .filter-name { color: #333; font-weight: 500; }
     .filter-date { color: #666; font-size: 0.85rem; }
+    .filter-status {
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .filter-status.status-pending { background: #fff3cd; color: #856404; }
+    .filter-status.status-confirmed { background: #cce5ff; color: #004085; }
+    .filter-status.status-completed { background: #d4edda; color: #155724; }
     .no-filter { color: #999; font-style: italic; padding: 15px; text-align: center; background: #f8f9fa; border-radius: 10px; }
     .more-items { color: #28a745; font-size: 0.9rem; text-align: center; margin-top: 10px; font-weight: 500; }
+    .card-footer { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; text-align: right; }
+    .view-detail { color: #28a745; font-weight: 500; font-size: 0.9rem; }
+    .view-detail i { margin-right: 5px; }
     
     /* Dropdown styles */
     .user-dropdown { position: relative; }

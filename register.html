@@ -164,45 +164,51 @@
                 return;
             }
             
-            // Collect form data
+            // Collect form data cho API
+            const phone = document.getElementById('phone').value.replace(/\s/g, ''); // Bỏ khoảng trắng
             const formData = {
-                fullName: document.getElementById('fullName').value,
-                phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value,
-                address: document.getElementById('address').value,
-                username: document.getElementById('username').value,
-                password: password,
-                receiveNews: document.getElementById('receiveNews').checked,
-                createdAt: new Date().toISOString()
+                name: document.getElementById('fullName').value,
+                username: document.getElementById('fullName').value,
+                phone: phone,
+                email: document.getElementById('email').value || '',
+                address: document.getElementById('address').value || '',
+                pass: password
             };
+            
+            console.log('Register data:', formData);
             
             // Show loading
             const submitBtn = document.querySelector('.login-btn');
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
             submitBtn.disabled = true;
             
-            // Simulate registration
-            setTimeout(() => {
-                // Save user (in real app, send to server)
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
+            // Gọi API đăng ký
+            fetch('/api/user/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(result => {
+                console.log('Register response:', result);
                 
-                // Check if username exists
-                if (users.find(u => u.username === formData.username)) {
-                    showAlert('Tên đăng nhập đã tồn tại!', 'error');
+                if (result.code === 1 || result.code === 200 || result.status === 1 || result.success) {
+                    showAlert('Đăng ký thành công! Đang chuyển đến trang đăng nhập...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showAlert(result.message || 'Đăng ký thất bại. Vui lòng thử lại!', 'error');
                     submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Đăng Ký';
                     submitBtn.disabled = false;
-                    return;
                 }
-                
-                users.push(formData);
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                showAlert('Đăng ký thành công! Đang chuyển đến trang đăng nhập...', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
-            }, 1500);
+            })
+            .catch(error => {
+                console.log('Error:', error);
+                showAlert('Có lỗi xảy ra. Vui lòng thử lại!', 'error');
+                submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Đăng Ký';
+                submitBtn.disabled = false;
+            });
         });
         
         // Show alert

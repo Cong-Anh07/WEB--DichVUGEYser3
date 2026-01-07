@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Sản Phẩm - Nanogeyser</title>
+    <link rel="icon" href="logo-web.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo"><a href="index.html"><img src="Logo (1).png" alt="Nanogeyser Logo"></a></div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Trang Chủ</a></li>
+                    <li><a href="booking.html">Đặt Lịch</a></li>
+                    <li><a href="index.html#contact">Liên Hệ</a></li>
+                    <li id="authNav"><a href="login.html" class="btn-secondary">Đăng Nhập</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="detail-main">
+        <div class="container">
+            <a href="history-filter.html" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại</a>
+            
+            <div id="detailLoading" class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Đang tải chi tiết...</p>
+            </div>
+
+            <div id="productDetail" class="product-detail-card" style="display:none;">
+                <!-- Product Image -->
+                <div class="product-image-section">
+                    <img id="productImage" src="Logo (1).png" alt="Sản phẩm">
+                </div>
+                
+                <!-- Product Name -->
+                <h1 id="productName" class="product-title">Tên sản phẩm</h1>
+                
+                <!-- Product Info -->
+                <div class="product-info-section">
+                    <div class="info-row">
+                        <span class="label">Số cấp lọc:</span>
+                        <span class="value" id="filterLevel">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Ngày lắp máy:</span>
+                        <span class="value" id="installDate">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Vị trí lắp đặt:</span>
+                        <span class="value" id="address">-</span>
+                    </div>
+                </div>
+                
+                <!-- Filter History -->
+                <div class="filter-history-section">
+                    <h2 class="section-title"><i class="fas fa-history"></i> Lịch sử thay lõi</h2>
+                    <div id="filterHistoryList"></div>
+                </div>
+            </div>
+
+            <div id="errorState" class="error-state" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>Không tìm thấy sản phẩm</h3>
+                <a href="history-filter.html" class="btn btn-primary">Quay lại</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom"><p>&copy; 2024 Nanogeyser. Tất cả quyền được bảo lưu.</p></div>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+    const BASE_URL = 'http://mobile.chothuetatca.com/';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'login.html';
+            return;
+        }
+        updateAuthNav();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        
+        if (productId) {
+            loadProductDetail(currentUser.id, productId);
+        } else {
+            showError();
+        }
+    });
+
+    function loadProductDetail(userId, productId) {
+        fetch(`/api/user/listProduct/${userId}`)
+            .then(res => res.json())
+            .then(result => {
+                console.log('Products response:', result);
+                document.getElementById('detailLoading').style.display = 'none';
+                
+                let products = [];
+                if (result.data && result.data.listProducts) {
+                    products = result.data.listProducts;
+                }
+                
+                const product = products.find(p => p.id == productId);
+                if (product) {
+                    displayProductDetail(product);
+                } else {
+                    showError();
+                }
+            })
+            .catch(err => {
+                console.log('Error:', err);
+                document.getElementById('detailLoading').style.display = 'none';
+                showError();
+            });
+    }
+
+    function displayProductDetail(item) {
+        document.getElementById('productDetail').style.display = 'block';
+        
+        const product = item.product || {};
+        const filterCores = item.order_filter_cores || [];
+        
+        // Product image
+        let imageUrl = product.image || product.avatar || '';
+        if (imageUrl && !imageUrl.startsWith('http')) {
+            imageUrl = BASE_URL + imageUrl;
+        }
+        if (imageUrl) {
+            document.getElementById('productImage').src = imageUrl;
+            document.getElementById('productImage').onerror = function() { this.src = 'Logo (1).png'; };
+        }
+        
+        // Product name
+        document.getElementById('productName').textContent = product.name || 'Sản phẩm';
+        
+        // Product info
+        document.getElementById('filterLevel').textContent = product.so_cap_loc || item.filter_core_level || '-';
+        document.getElementById('installDate').textContent = formatDateTime(item.ngaymua || item.created_at);
+        document.getElementById('address').textContent = item.address || '-';
+        
+        // Filter history
+        displayFilterHistory(filterCores, item.order_id);
+    }
+
+    function displayFilterHistory(filterCores, orderId) {
+        const container = document.getElementById('filterHistoryList');
+        
+        if (!filterCores || filterCores.length === 0) {
+            container.innerHTML = '<p class="no-history">Chưa có lịch sử thay lõi</p>';
+            return;
+        }
+        
+        container.innerHTML = filterCores.map((core, index) => `
+            <div class="filter-history-item">
+                <div class="history-header" onclick="toggleHistory(${index})">
+                    <span class="history-title">Lịch sử lần thay lõi ${index + 1} - Mã đơn ${core.order_id || orderId || 'N/A'}</span>
+                    <i class="fas fa-chevron-down toggle-icon" id="icon-${index}"></i>
+                </div>
+                <div class="history-body" id="body-${index}">
+                    <div class="history-row">
+                        <span class="label">Tên lõi:</span>
+                        <span class="value">${core.name || core.filter_core_name || 'Lõi lọc'}</span>
+                    </div>
+                    <div class="history-row">
+                        <span class="label">Ngày thay:</span>
+                        <span class="value">${formatDate(core.replace_date || core.ngay_thay || core.created_at)}</span>
+                    </div>
+                    <div class="history-row highlight">
+                        <span class="label">Ngày thay tiếp theo:</span>
+                        <span class="value">${formatDate(core.next_replace_date || core.ngay_thay_tiep)}</span>
+                    </div>
+                    <div class="history-row">
+                        <span class="label">Tổng tiền:</span>
+                        <span class="value">${formatPrice(core.price || core.gia || 0)}</span>
+                    </div>
+                    <a href="#" class="btn-view-detail" onclick="event.stopPropagation();">Xem chi tiết >></a>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function toggleHistory(index) {
+        const body = document.getElementById('body-' + index);
+        const icon = document.getElementById('icon-' + index);
+        const item = body.parentElement;
+        
+        if (body.classList.contains('open')) {
+            body.classList.remove('open');
+            icon.classList.remove('rotated');
+            item.classList.remove('active');
+        } else {
+            body.classList.add('open');
+            icon.classList.add('rotated');
+            item.classList.add('active');
+        }
+    }
+
+    function formatDateTime(dateStr) {
+        if (!dateStr) return '-';
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleString('vi-VN');
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('vi-VN');
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
+    function formatPrice(price) {
+        if (!price) return '0 đ';
+        return new Intl.NumberFormat('vi-VN').format(price) + ' đ';
+    }
+
+    function showError() {
+        document.getElementById('detailLoading').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+    }
+
+    function updateAuthNav() {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        const authNav = document.getElementById('authNav');
+        if (currentUser && authNav) {
+            authNav.innerHTML = `
+                <div class="user-dropdown">
+                    <a href="#" class="user-btn">
+                        <i class="fas fa-user-circle"></i>
+                        <span>${currentUser.username || currentUser.phone}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="booking.html"><i class="fas fa-calendar-plus"></i> Đặt lịch</a>
+                        <a href="history-booking.html"><i class="fas fa-calendar-check"></i> Lịch sử đặt lịch</a>
+                        <a href="history-filter.html"><i class="fas fa-filter"></i> Nhật ký thay lõi</a>
+                        <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function logout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+    }
+    </script>
+
+    <style>
+    .detail-main { padding: 100px 0 60px; min-height: 70vh; background: #f8f9fa; }
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: #28a745; text-decoration: none; font-weight: 500; margin-bottom: 20px; }
+    .back-link:hover { text-decoration: underline; }
+    
+    .loading-state, .error-state { text-align: center; padding: 60px 20px; }
+    .loading-state i { font-size: 3rem; color: #28a745; }
+    .error-state i { font-size: 3rem; color: #dc3545; margin-bottom: 15px; }
+    
+    .product-detail-card { background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
+    
+    .product-image-section { 
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9); 
+        padding: 30px; 
+        text-align: center; 
+    }
+    .product-image-section img { 
+        max-width: 280px; 
+        max-height: 250px; 
+        object-fit: contain;
+        border-radius: 10px;
+    }
+    
+    .product-title { 
+        text-align: center; 
+        color: #f5a623; 
+        font-size: 1.4rem; 
+        padding: 20px; 
+        margin: 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .product-info-section { padding: 20px 25px; border-bottom: 1px solid #eee; }
+    .info-row { display: flex; padding: 10px 0; border-bottom: 1px dashed #eee; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { width: 130px; color: #666; }
+    .info-row .value { flex: 1; color: #333; font-weight: 500; }
+    
+    .filter-history-section { padding: 25px; }
+    .section-title { 
+        color: #f5a623; 
+        font-size: 1.1rem; 
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .section-title i { margin-right: 8px; }
+    
+    .filter-history-item {
+        background: #fff;
+        border: 1px solid #eee;
+        border-left: 4px solid #f5a623;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .filter-history-item.active {
+        box-shadow: 0 4px 15px rgba(245, 166, 35, 0.2);
+    }
+    .filter-history-item .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        cursor: pointer;
+        background: #fafafa;
+        transition: background 0.3s;
+    }
+    .filter-history-item .history-header:hover {
+        background: #fff8e1;
+    }
+    .filter-history-item .history-title {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+    .filter-history-item .toggle-icon {
+        color: #f5a623;
+        transition: transform 0.3s ease;
+    }
+    .filter-history-item .toggle-icon.rotated {
+        transform: rotate(180deg);
+    }
+    .filter-history-item .history-body {
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 15px;
+        transition: max-height 0.4s ease, padding 0.3s ease;
+    }
+    .filter-history-item .history-body.open {
+        max-height: 500px;
+        padding: 15px;
+        border-top: 1px solid #eee;
+    }
+    .filter-history-item .history-row {
+        display: flex;
+        padding: 8px 0;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .filter-history-item .history-body.open .history-row {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .filter-history-item .history-body.open .history-row:nth-child(1) { transition-delay: 0.05s; }
+    .filter-history-item .history-body.open .history-row:nth-child(2) { transition-delay: 0.1s; }
+    .filter-history-item .history-body.open .history-row:nth-child(3) { transition-delay: 0.15s; }
+    .filter-history-item .history-body.open .history-row:nth-child(4) { transition-delay: 0.2s; }
+    .filter-history-item .history-row .label {
+        width: 140px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    .filter-history-item .history-row .value {
+        flex: 1;
+        color: #333;
+    }
+    .filter-history-item .history-row.highlight .label {
+        color: #f5a623;
+        font-style: italic;
+        font-weight: 500;
+    }
+    .btn-view-detail {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 8px 20px;
+        background: linear-gradient(135deg, #f5a623, #f7b731);
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease 0.25s, transform 0.3s ease 0.25s;
+    }
+    .filter-history-item .history-body.open .btn-view-detail {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .btn-view-detail:hover { 
+        opacity: 0.9; 
+        transform: scale(1.02);
+    }
+    
+    .no-history { text-align: center; color: #999; padding: 30px; font-style: italic; }
+    
+    /* Dropdown */
+    .user-dropdown { position: relative; }
+    .user-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, #28a745, #34ce57); color: white !important; border-radius: 25px; text-decoration: none; font-weight: 500; }
+    .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: white; min-width: 180px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-radius: 10px; z-index: 9999; margin-top: 5px; padding: 8px 0; }
+    .user-dropdown:hover .dropdown-menu { display: block; }
+    .dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #333 !important; text-decoration: none; }
+    .dropdown-menu a:hover { background: #f5f5f5; }
+    .dropdown-menu a i { width: 20px; color: #28a745; }
+    </style>
+</body>
+</html>

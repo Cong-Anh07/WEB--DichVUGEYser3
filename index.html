@@ -22,7 +22,6 @@
                 <ul class="nav-menu">
                     <li><a href="index.html">Trang Chủ</a></li>
                     <li><a href="booking.html">Đặt Lịch</a></li>
-                    <li><a href="index.html#warranty">Bảo Hành</a></li>
                     <li><a href="index.html#contact">Liên Hệ</a></li>
                     <li id="authNav">
                         <a href="login.html" class="btn-secondary">Đăng Nhập</a>
@@ -150,46 +149,15 @@
         </div>
     </section>
 
-    <!-- Warranty Section -->
-    <section id="warranty" class="warranty">
+    <!-- News Section -->
+    <section id="news" class="news-section">
         <div class="container">
-            <h2 class="section-title">Chính Sách Bảo Hành</h2>
-            <div class="warranty-content">
-                <div class="warranty-info">
-                    <h3>Cam Kết Bảo Hành Chính Hãng</h3>
-                    <div class="warranty-items">
-                        <div class="warranty-item">
-                            <i class="fas fa-shield-alt"></i>
-                            <div>
-                                <h4>Bảo Hành 2 Năm</h4>
-                                <p>Toàn bộ máy lọc nước Nanogeyser</p>
-                            </div>
-                        </div>
-                        <div class="warranty-item">
-                            <i class="fas fa-clock"></i>
-                            <div>
-                                <h4>Phản Hồi Trong 2 Giờ</h4>
-                                <p>Tiếp nhận và xử lý yêu cầu bảo hành</p>
-                            </div>
-                        </div>
-                        <div class="warranty-item">
-                            <i class="fas fa-home"></i>
-                            <div>
-                                <h4>Dịch Vụ Tại Nhà</h4>
-                                <p>Miễn phí trong phạm vi nội thành</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="warranty-form">
-                    <h3>Kiểm Tra Bảo Hành</h3>
-                    <form id="warrantyCheck">
-                        <input type="text" placeholder="Mã sản phẩm" required>
-                        <input type="text" placeholder="Số điện thoại" required>
-                        <button type="submit" class="btn btn-primary">Kiểm Tra</button>
-                    </form>
-                </div>
+            <h2 class="section-title">Tin Tức Nổi Bật</h2>
+            <div id="newsLoading" style="text-align:center; padding:40px;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:#28a745;"></i>
+                <p style="margin-top:10px; color:#666;">Đang tải tin tức...</p>
             </div>
+            <div class="news-grid" id="newsGrid" style="display:none;"></div>
         </div>
     </section>
 
@@ -272,16 +240,11 @@
         </div>
     </footer>
 
-    <!-- Floating Contact Buttons -->
+    <!-- Floating Booking Button -->
     <div class="floating-buttons">
-        <a href="https://facebook.com" target="_blank" class="float-btn facebook" title="Facebook">
-            <i class="fab fa-facebook-f"></i>
-        </a>
-        <a href="https://zalo.me/0901234567" target="_blank" class="float-btn zalo" title="Zalo">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo">
-        </a>
-        <a href="tel:1900xxxx" class="float-btn phone" title="Gọi ngay">
-            <i class="fas fa-phone-alt"></i>
+        <a href="booking.html" class="float-btn booking" title="Đặt lịch ngay">
+            <i class="fas fa-calendar-plus"></i>
+            <span>Đặt lịch</span>
         </a>
     </div>
 
@@ -289,6 +252,88 @@
     <script src="data.js"></script>
     <script src="script.js"></script>
     <script>
+    // Load news from API
+    document.addEventListener('DOMContentLoaded', function() {
+        loadNews();
+    });
+
+    function loadNews() {
+        fetch('/api/blog/list')
+            .then(res => res.json())
+            .then(result => {
+                document.getElementById('newsLoading').style.display = 'none';
+                document.getElementById('newsGrid').style.display = 'grid';
+                
+                let news = [];
+                if (result.data && Array.isArray(result.data)) {
+                    news = result.data.slice(0, 6); // Lấy 6 tin mới nhất
+                } else if (Array.isArray(result)) {
+                    news = result.slice(0, 6);
+                }
+                
+                displayNews(news);
+            })
+            .catch(err => {
+                console.log('Error loading news:', err);
+                document.getElementById('newsLoading').innerHTML = '<p style="color:#666;">Không thể tải tin tức</p>';
+            });
+    }
+
+    function displayNews(news) {
+        const container = document.getElementById('newsGrid');
+        if (news.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#666; grid-column:1/-1;">Chưa có tin tức</p>';
+            return;
+        }
+        
+        const baseUrl = 'http://mobile.chothuetatca.com/';
+        
+        container.innerHTML = news.map(item => {
+            // Xử lý đường dẫn ảnh
+            let imageUrl = item.image || item.thumbnail || item.avatar || '';
+            if (imageUrl && !imageUrl.startsWith('http')) {
+                imageUrl = baseUrl + imageUrl;
+            }
+            if (!imageUrl) {
+                imageUrl = 'Logo (1).png'; // Dùng logo làm ảnh mặc định
+            }
+            
+            // Link đến trang chi tiết với ID
+            const detailLink = `news-detail.html?id=${item.id}`;
+            
+            return `
+            <div class="news-card" onclick="window.location.href='${detailLink}'" style="cursor:pointer;">
+                <div class="news-image">
+                    <img src="${imageUrl}" alt="${item.title || item.name || 'Tin tức'}" onerror="this.src='Logo (1).png'">
+                </div>
+                <div class="news-content">
+                    <span class="news-date"><i class="fas fa-calendar"></i> ${formatNewsDate(item.created_at || item.date)}</span>
+                    <h3>${item.title || item.name || 'Tin tức'}</h3>
+                    <p>${truncateText(item.description || item.content || item.des || '', 100)}</p>
+                    <a href="${detailLink}" class="news-link">Xem thêm <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    function formatNewsDate(dateStr) {
+        if (!dateStr) return '';
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('vi-VN');
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
+    function truncateText(text, maxLength) {
+        if (!text) return '';
+        // Remove HTML tags
+        const plainText = text.replace(/<[^>]*>/g, '');
+        if (plainText.length <= maxLength) return plainText;
+        return plainText.substring(0, maxLength) + '...';
+    }
+
     // Check login status and update navbar
     document.addEventListener('DOMContentLoaded', function() {
         const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
@@ -306,13 +351,8 @@
                     </a>
                     <div class="dropdown-menu">
                         <a href="booking.html"><i class="fas fa-calendar-plus"></i> Đặt lịch</a>
-                        <div class="dropdown-submenu">
-                            <a href="#" class="submenu-toggle"><i class="fas fa-history"></i> Lịch sử <i class="fas fa-chevron-right submenu-arrow"></i></a>
-                            <div class="submenu">
-                                <a href="history-booking.html"><i class="fas fa-calendar-check"></i> Lịch sử đặt lịch</a>
-                                <a href="history-filter.html"><i class="fas fa-filter"></i> Nhật ký thay lõi</a>
-                            </div>
-                        </div>
+                        <a href="history-booking.html"><i class="fas fa-calendar-check"></i> Lịch sử đặt lịch</a>
+                        <a href="history-filter.html"><i class="fas fa-filter"></i> Nhật ký thay lõi</a>
                         <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
                     </div>
                 </div>
@@ -332,52 +372,114 @@
     }
     </script>
     <style>
-    /* Floating Contact Buttons */
+    /* News Section */
+    .news-section {
+        padding: 80px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        margin-top: 40px;
+    }
+    .news-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+    }
+    .news-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+    .news-image {
+        height: 200px;
+        overflow: hidden;
+    }
+    .news-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+    .news-card:hover .news-image img {
+        transform: scale(1.1);
+    }
+    .news-content {
+        padding: 25px;
+    }
+    .news-date {
+        font-size: 0.85rem;
+        color: #28a745;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+    .news-content h3 {
+        font-size: 1.1rem;
+        color: #1a1a2e;
+        margin-bottom: 12px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .news-content p {
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+    .news-link {
+        color: #28a745;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: gap 0.3s;
+    }
+    .news-link:hover {
+        gap: 10px;
+    }
+    @media (max-width: 992px) {
+        .news-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 576px) {
+        .news-grid { grid-template-columns: 1fr; }
+    }
+    
+    /* Floating Booking Button */
     .floating-buttons {
         position: fixed;
         bottom: 30px;
         right: 30px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
         z-index: 9999;
     }
-    .float-btn {
-        width: 65px;
-        height: 65px;
-        border-radius: 50%;
+    .float-btn.booking {
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 10px;
+        padding: 15px 25px;
+        background: linear-gradient(135deg, #28a745, #34ce57);
+        color: white;
         text-decoration: none;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        box-shadow: 0 6px 25px rgba(40,167,69,0.4);
         transition: all 0.3s;
     }
-    .float-btn:hover {
-        transform: scale(1.15);
-        box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+    .float-btn.booking:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 35px rgba(40,167,69,0.5);
     }
-    .float-btn.facebook {
-        background: #1877f2;
-        color: white;
-    }
-    .float-btn.facebook i {
-        font-size: 1.8rem;
-    }
-    .float-btn.zalo {
-        background: white;
-        border: 2px solid #0068ff;
-    }
-    .float-btn.zalo img {
-        width: 42px;
-        height: 42px;
-    }
-    .float-btn.phone {
-        background: #f5a623;
-        color: #333;
-    }
-    .float-btn.phone i {
-        font-size: 1.7rem;
+    .float-btn.booking i {
+        font-size: 1.2rem;
     }
     
     /* Download App in Footer */
@@ -476,19 +578,29 @@
         display: none;
         position: absolute;
         left: 100%;
-        top: 0;
+        top: -8px;
         background: white;
-        min-width: 180px;
+        min-width: 200px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         border-radius: 10px;
         padding: 8px 0;
-        margin-left: 5px;
+        margin-left: 0;
+    }
+    /* Tạo vùng kết nối giữa menu và submenu */
+    .dropdown-submenu::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -10px;
+        width: 15px;
+        height: 100%;
     }
     .dropdown-submenu:hover .submenu {
         display: block;
     }
     .submenu a {
         padding: 10px 16px;
+        white-space: nowrap;
     }
     /* Đảm bảo nav-menu không che dropdown */
     .nav-menu {

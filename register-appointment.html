@@ -404,6 +404,16 @@ function showNoProducts(message) {
     `;
 }
 
+// Format datetime từ "2026-01-05" và "09:00" thành "05/01/2026 09:00"
+function formatDateTime(dateStr, timeStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-'); // ["2026", "01", "05"]
+    if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]} ${timeStr || '00:00'}`;
+    }
+    return `${dateStr} ${timeStr || '00:00'}`;
+}
+
 function handleSubmit(e) {
     e.preventDefault();
     
@@ -412,23 +422,44 @@ function handleSubmit(e) {
         return;
     }
     
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceId = urlParams.get('service_id');
+    
     const data = {
-        service: selectedService ? selectedService.name : '',
-        product_id: selectedProduct.id,
-        product_name: selectedProduct.name,
-        fullName: document.getElementById('fullName').value,
-        phone: document.getElementById('phone').value,
-        address: document.getElementById('address').value,
-        date: document.getElementById('appointmentDate').value,
-        time: document.getElementById('appointmentTime').value,
-        notes: document.getElementById('notes').value
+        customer: String(currentUser.id),
+        time_star: formatDateTime(document.getElementById('appointmentDate').value, document.getElementById('appointmentTime').value),
+        time_end: formatDateTime(document.getElementById('appointmentDate').value, document.getElementById('appointmentTime').value),
+        type_task: '1',
+        des: document.getElementById('notes').value || 'Đặt lịch từ website',
+        status: '1',
+        priority: '1',
+        staff: '',
+        user_create: String(currentUser.id)
     };
     
     console.log('Booking data:', data);
-    alert('Đặt lịch thành công!\n\nDịch vụ: ' + data.service + '\nSản phẩm: ' + data.product_name + '\nNgày: ' + data.date + '\nGiờ: ' + data.time);
     
-    // Redirect về trang chủ
-    window.location.href = 'index.html';
+    // Gửi lên API
+    fetch('/api/tasks/them', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+        console.log('API response:', result);
+        if (result.code === 1 || result.code === 200 || result.success) {
+            alert('Đặt lịch thành công!\n\nChúng tôi sẽ liên hệ xác nhận trong thời gian sớm nhất.');
+            window.location.href = 'history-booking.html';
+        } else {
+            alert(result.message || 'Có lỗi xảy ra. Vui lòng thử lại!');
+        }
+    })
+    .catch(error => {
+        console.log('Error:', error);
+        alert('Có lỗi xảy ra. Vui lòng thử lại!');
+    });
 }
 
 // Cập nhật navbar theo trạng thái đăng nhập
@@ -445,8 +476,14 @@ function updateAuthNav() {
                     <i class="fas fa-chevron-down"></i>
                 </a>
                 <div class="dropdown-menu">
-                    <a href="customer-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                     <a href="booking.html"><i class="fas fa-calendar-plus"></i> Đặt lịch</a>
+                    <div class="dropdown-submenu">
+                        <a href="#" class="submenu-toggle"><i class="fas fa-history"></i> Lịch sử <i class="fas fa-chevron-right submenu-arrow"></i></a>
+                        <div class="submenu">
+                            <a href="history-booking.html"><i class="fas fa-calendar-check"></i> Lịch sử đặt lịch</a>
+                            <a href="history-filter.html"><i class="fas fa-filter"></i> Nhật ký thay lõi</a>
+                        </div>
+                    </div>
                     <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
                 </div>
             </div>

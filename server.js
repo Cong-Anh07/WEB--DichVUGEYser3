@@ -60,6 +60,7 @@ app.get('/api/order/filterCore/:id', (req, res) => proxyGetWithParams(`/order/fi
 app.get('/api/tasks', proxyGet('/tasks'));
 app.get('/api/tasks/ton-dong', proxyGet('/tasks/ton-dong'));
 app.get('/api/tasks/:id', (req, res) => proxyGetWithParams(`/tasks/${req.params.id}`, res));
+app.get('/api/tasks/customer/:id', (req, res) => proxyGetWithParams(`/tasks/customer/${req.params.id}`, res));
 app.post('/api/tasks/them', proxyPost('/tasks/them'));
 app.post('/api/tasks/xoa', proxyPost('/tasks/xoa'));
 app.post('/api/tasks/phone', proxyPost('/tasks/phone'));

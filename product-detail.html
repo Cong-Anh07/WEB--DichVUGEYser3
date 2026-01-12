@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi Tiết Sản Phẩm - Nanogeyser</title>
-    <link rel="icon" href="logo-web.png" type="image/png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/public/images/logo-web.png" type="image/png">
+    <link rel="stylesheet" href="/src/css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <header class="header">
         <nav class="navbar">
             <div class="nav-container">
-                <div class="logo"><a href="index.html"><img src="Logo (1).png" alt="Nanogeyser Logo"></a></div>
+                <div class="logo"><a href="index.html"><img src="/public/images/logo.png" alt="Nanogeyser Logo"></a></div>
                 <ul class="nav-menu">
                     <li><a href="index.html">Trang Chủ</a></li>
                     <li><a href="booking.html">Đặt Lịch</a></li>
@@ -35,7 +35,7 @@
             <div id="productDetail" class="product-detail-card" style="display:none;">
                 <!-- Product Image -->
                 <div class="product-image-section">
-                    <img id="productImage" src="Logo (1).png" alt="Sản phẩm">
+                    <img id="productImage" src="/public/images/logo.png" alt="Sản phẩm">
                 </div>
                 
                 <!-- Product Name -->
@@ -78,7 +78,7 @@
         </div>
     </footer>
 
-    <script src="config.js"></script>
+    <script src="/src/js/config.js"></script>
     <script>
     const BASE_URL = 'http://mobile.chothuetatca.com/';
 
@@ -139,7 +139,7 @@
         }
         if (imageUrl) {
             document.getElementById('productImage').src = imageUrl;
-            document.getElementById('productImage').onerror = function() { this.src = 'Logo (1).png'; };
+            document.getElementById('productImage').onerror = function() { this.src = '/public/images/logo.png'; };
         }
         
         // Product name

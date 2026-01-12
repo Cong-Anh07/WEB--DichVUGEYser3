@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi Tiết Tin Tức - Nanogeyser</title>
-    <link rel="icon" href="logo-web.png" type="image/png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/public/images/logo-web.png" type="image/png">
+    <link rel="stylesheet" href="/src/css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -13,7 +13,7 @@
         <nav class="navbar">
             <div class="nav-container">
                 <div class="logo">
-                    <a href="index.html"><img src="Logo (1).png" alt="Nanogeyser Logo"></a>
+                    <a href="index.html"><img src="/public/images/logo.png" alt="Nanogeyser Logo"></a>
                 </div>
                 <ul class="nav-menu">
                     <li><a href="index.html">Trang Chủ</a></li>
@@ -65,7 +65,7 @@
         </div>
     </footer>
 
-    <script src="config.js"></script>
+    <script src="/src/js/config.js"></script>
     <script>
     const BASE_URL = 'http://mobile.chothuetatca.com/';
 
@@ -145,9 +145,9 @@
         const imgEl = document.getElementById('newsImage');
         if (imageUrl) {
             imgEl.src = imageUrl;
-            imgEl.onerror = function() { this.src = 'Logo (1).png'; };
+            imgEl.onerror = function() { this.src = '/public/images/logo.png'; };
         } else {
-            imgEl.src = 'Logo (1).png';
+            imgEl.src = '/public/images/logo.png';
         }
         
         // Content - có thể là HTML

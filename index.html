@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nanogeyser - Dịch Vụ Bảo Hành & Bảo Dưỡng Máy Lọc Nước</title>
-    <link rel="icon" href="logo-web.png" type="image/png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/public/images/logo-web.png" type="image/png">
+    <link rel="stylesheet" href="/src/css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -15,7 +15,7 @@
             <div class="nav-container">
                 <div class="logo">
                     <a href="index.html">
-                        <img src="Logo (1).png" alt="Nanogeyser Logo">
+                        <img src="/public/images/logo.png" alt="Nanogeyser Logo">
                     </a>
                     <span></span>
                 </div>
@@ -43,7 +43,7 @@
     <section id="home" class="hero">
         <!-- Hero Image -->
         <div class="hero-image-container">
-            <img src="1753173818.jpg" alt="Máy lọc nước Nanogeyser">
+            <img src="/public/images/1753173818.jpg" alt="Máy lọc nước Nanogeyser">
             
             <!-- Bottom-aligned Cards -->
             <div class="bottom-cards-wrapper">
@@ -248,9 +248,9 @@
         </a>
     </div>
 
-    <script src="config.js"></script>
-    <script src="data.js"></script>
-    <script src="script.js"></script>
+    <script src="/src/js/config.js"></script>
+    <script src="/src/js/data.js"></script>
+    <script src="/src/js/script.js"></script>
     <script>
     // Load news from API
     document.addEventListener('DOMContentLoaded', function() {
@@ -295,7 +295,7 @@
                 imageUrl = baseUrl + imageUrl;
             }
             if (!imageUrl) {
-                imageUrl = 'Logo (1).png'; // Dùng logo làm ảnh mặc định
+                imageUrl = '/public/images/logo.png'; // Dùng logo làm ảnh mặc định
             }
             
             // Link đến trang chi tiết với ID
@@ -304,7 +304,7 @@
             return `
             <div class="news-card" onclick="window.location.href='${detailLink}'" style="cursor:pointer;">
                 <div class="news-image">
-                    <img src="${imageUrl}" alt="${item.title || item.name || 'Tin tức'}" onerror="this.src='Logo (1).png'">
+                    <img src="${imageUrl}" alt="${item.title || item.name || 'Tin tức'}" onerror="this.src='/public/images/logo.png'">
                 </div>
                 <div class="news-content">
                     <span class="news-date"><i class="fas fa-calendar"></i> ${formatNewsDate(item.created_at || item.date)}</span>

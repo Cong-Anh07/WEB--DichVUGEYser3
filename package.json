@@ -2,13 +2,11 @@
   "name": "nanogeyser-website",
   "version": "1.0.0",
   "description": "Website dịch vụ bảo hành bảo dưỡng máy lọc nước Nanogeyser",
-  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "install-deps": "npm install express",
-    "python-server": "python -m http.server 8000",
-    "python3-server": "python3 -m http.server 8000"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [
     "nanogeyser",
@@ -19,10 +17,7 @@
   ],
   "author": "Nanogeyser Team",
   "license": "MIT",
-  "dependencies": {
-    "express": "^4.22.1"
-  },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "vite": "^5.4.0"
   }
 }

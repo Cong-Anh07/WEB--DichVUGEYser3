@@ -248,17 +248,17 @@
         </a>
     </div>
 
-    <script src="/src/js/config.js"></script>
-    <script src="/src/js/data.js"></script>
-    <script src="/src/js/script.js"></script>
-    <script>
+    <script type="module" src="/src/js/config.js"></script>
+    <script type="module" src="/src/js/data.js"></script>
+    <script type="module" src="/src/js/script.js"></script>
+    <script type="module">
     // Load news from API
     document.addEventListener('DOMContentLoaded', function() {
         loadNews();
     });
 
     function loadNews() {
-        fetch('/api/blog/list')
+        fetch(`${import.meta.env.VITE_API_URL}/api/blog/list`)
             .then(res => res.json())
             .then(result => {
                 document.getElementById('newsLoading').style.display = 'none';

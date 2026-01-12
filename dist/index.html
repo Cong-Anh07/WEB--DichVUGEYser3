@@ -6,6 +6,7 @@
     <title>Nanogeyser - Dịch Vụ Bảo Hành & Bảo Dưỡng Máy Lọc Nước</title>
     <link rel="icon" href="/assets/logo-web-CIp09qxk.png" type="image/png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-DdEg51Jn.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-DXe8NeaQ.css">
 </head>
 <body>
@@ -247,130 +248,7 @@
             <span>Đặt lịch</span>
         </a>
     </div>
-
-    <script src="/src/js/config.js"></script>
-    <script src="/src/js/data.js"></script>
-    <script src="/src/js/script.js"></script>
-    <script>
-    // Load news from API
-    document.addEventListener('DOMContentLoaded', function() {
-        loadNews();
-    });
-
-    function loadNews() {
-        fetch('/api/blog/list')
-            .then(res => res.json())
-            .then(result => {
-                document.getElementById('newsLoading').style.display = 'none';
-                document.getElementById('newsGrid').style.display = 'grid';
-                
-                let news = [];
-                if (result.data && Array.isArray(result.data)) {
-                    news = result.data.slice(0, 6); // Lấy 6 tin mới nhất
-                } else if (Array.isArray(result)) {
-                    news = result.slice(0, 6);
-                }
-                
-                displayNews(news);
-            })
-            .catch(err => {
-                console.log('Error loading news:', err);
-                document.getElementById('newsLoading').innerHTML = '<p style="color:#666;">Không thể tải tin tức</p>';
-            });
-    }
-
-    function displayNews(news) {
-        const container = document.getElementById('newsGrid');
-        if (news.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#666; grid-column:1/-1;">Chưa có tin tức</p>';
-            return;
-        }
-        
-        const baseUrl = 'http://mobile.chothuetatca.com/';
-        
-        container.innerHTML = news.map(item => {
-            // Xử lý đường dẫn ảnh
-            let imageUrl = item.image || item.thumbnail || item.avatar || '';
-            if (imageUrl && !imageUrl.startsWith('http')) {
-                imageUrl = baseUrl + imageUrl;
-            }
-            if (!imageUrl) {
-                imageUrl = '/public/images/logo.png'; // Dùng logo làm ảnh mặc định
-            }
-            
-            // Link đến trang chi tiết với ID
-            const detailLink = `news-detail.html?id=${item.id}`;
-            
-            return `
-            <div class="news-card" onclick="window.location.href='${detailLink}'" style="cursor:pointer;">
-                <div class="news-image">
-                    <img src="${imageUrl}" alt="${item.title || item.name || 'Tin tức'}" onerror="this.src='/public/images/logo.png'">
-                </div>
-                <div class="news-content">
-                    <span class="news-date"><i class="fas fa-calendar"></i> ${formatNewsDate(item.created_at || item.date)}</span>
-                    <h3>${item.title || item.name || 'Tin tức'}</h3>
-                    <p>${truncateText(item.description || item.content || item.des || '', 100)}</p>
-                    <a href="${detailLink}" class="news-link">Xem thêm <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-        `}).join('');
-    }
-
-    function formatNewsDate(dateStr) {
-        if (!dateStr) return '';
-        try {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('vi-VN');
-        } catch (e) {
-            return dateStr;
-        }
-    }
-
-    function truncateText(text, maxLength) {
-        if (!text) return '';
-        // Remove HTML tags
-        const plainText = text.replace(/<[^>]*>/g, '');
-        if (plainText.length <= maxLength) return plainText;
-        return plainText.substring(0, maxLength) + '...';
-    }
-
-    // Check login status and update navbar
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-        const authNav = document.getElementById('authNav');
-        const registerNav = document.getElementById('registerNav');
-        
-        if (currentUser) {
-            // User đã đăng nhập - hiển thị tên và dropdown
-            authNav.innerHTML = `
-                <div class="user-dropdown">
-                    <a href="#" class="user-btn">
-                        <i class="fas fa-user-circle"></i>
-                        <span>${currentUser.username || currentUser.phone}</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a href="booking.html"><i class="fas fa-calendar-plus"></i> Đặt lịch</a>
-                        <a href="history-booking.html"><i class="fas fa-calendar-check"></i> Lịch sử đặt lịch</a>
-                        <a href="history-filter.html"><i class="fas fa-filter"></i> Nhật ký thay lõi</a>
-                        <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
-                    </div>
-                </div>
-            `;
-            // Ẩn nút đăng ký
-            registerNav.style.display = 'none';
-        }
-    });
-    
-    // Logout function
-    function logout() {
-        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-            sessionStorage.removeItem('currentUser');
-            sessionStorage.removeItem('loginTime');
-            window.location.href = 'index.html';
-        }
-    }
-    </script>
+
     <style>
     /* News Section */
     .news-section {

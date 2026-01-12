@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Lịch Hẹn - Nanogeyser</title>
+    <link rel="icon" href="./assets/logo-web-CIp09qxk.png" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .appointment-page {
+            padding-top: 100px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+        }
+
+        .appointment-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #28a745;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .appointment-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            padding: 30px;
+            color: white;
+        }
+
+        .card-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            opacity: 0.9;
+        }
+
+        .service-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .service-badge i {
+            font-size: 1.5rem;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #28a745;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .form-group label .req {
+            color: #e74c3c;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+    </style>
+  <link rel="stylesheet" crossorigin href="./assets/styles-DXe8NeaQ.css">
+</head>
+
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo"><a href="index.html"><img src="./assets/logo-BPhqW2iW.png" alt="Nanogeyser Logo"></a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Trang Chủ</a></li>
+                    <li><a href="products.html">Sản Phẩm</a></li>
+                    <li><a href="booking.html">Đặt Lịch</a></li>
+                    <li id="authNav"><a href="login.html" class="btn-secondary">Đăng Nhập</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="appointment-page">
+        <div class="appointment-container">
+            <a href="booking.html" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại chọn dịch vụ</a>
+
+            <div class="appointment-card">
+                <div class="card-header">
+                    <h1><i class="fas fa-calendar-check"></i> Đăng Ký Lịch Hẹn</h1>
+                    <p>Hoàn tất thông tin để đặt lịch dịch vụ</p>
+                    <div class="service-badge">
+                        <i id="serviceIcon" class="fas fa-tools"></i>
+                        <div>
+                            <div id="serviceName" style="font-weight:600;">Bảo Dưỡng Định Kỳ</div>
+                            <div id="servicePrice" style="font-size:0.9rem; opacity:0.9;">300.000 VND</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <form id="appointmentForm">
+                        <!-- Chọn sản phẩm -->
+                        <div class="section">
+                            <h3 class="section-title"><i class="fas fa-box"></i> Chọn sản phẩm</h3>
+                            <div class="form-group">
+                                <label>Sản phẩm của bạn <span class="req">*</span></label>
+                                <select class="form-control" id="productSelect" required>
+                                    <option value="">Đang tải sản phẩm...</option>
+                                </select>
+                            </div>
+                            <div class="product-list" id="productList"></div>
+                        </div>
+
+                        <!-- Thông tin khách hàng -->
+                        <div class="section">
+                            <h3 class="section-title"><i class="fas fa-user"></i> Thông tin khách hàng</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Họ và tên <span class="req">*</span></label>
+                                    <input type="text" class="form-control" id="fullName" required
+                                        placeholder="Nguyễn Văn A">
+                                </div>
+                                <div class="form-group">
+                                    <label>Số điện thoại <span class="req">*</span></label>
+                                    <input type="tel" class="form-control" id="phone" required
+                                        placeholder="0901 234 567">
+                                </div>
+                                <div class="form-group full">
+                                    <label>Địa chỉ <span class="req">*</span></label>
+                                    <input type="text" class="form-control" id="address" required
+                                        placeholder="Số nhà, đường, quận/huyện, thành phố">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thời gian hẹn -->
+                        <div class="section">
+                            <h3 class="section-title"><i class="fas fa-calendar-alt"></i> Thời gian hẹn</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Ngày hẹn <span class="req">*</span></label>
+                                    <input type="date" class="form-control" id="appointmentDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Khung giờ <span class="req">*</span></label>
+                                    <input type="time" class="form-control" id="appointmentTime" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ghi chú -->
+                        <div class="section">
+                            <h3 class="section-title"><i class="fas fa-clipboard"></i> Ghi chú</h3>
+                            <div class="form-group">
+                                <textarea class="form-control" id="notes"
+                                    placeholder="Mô tả vấn đề hoặc yêu cầu đặc biệt..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Tổng kết -->
+                        <div class="summary-box">
+                            <div class="summary-row"><span>Dịch vụ:</span><span id="sumService">-</span></div>
+                            <div class="summary-row"><span>Sản phẩm:</span><span id="sumProduct">-</span></div>
+                            <div class="summary-row total"><span>Phí dịch vụ:</span><span id="sumTotal">0 VND</span>
+                            </div>
+                        </div>
+
+                        <!-- Nút submit -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="location.href='booking.html'">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check-circle"></i> Xác nhận đặt lịch
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
+
+<style>
+    .product-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    .product-item {
+        padding: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .product-item:hover {
+        border-color: #28a745;
+        background: #f0fff4;
+    }
+
+    .product-item.selected {
+        border-color: #28a745;
+        background: linear-gradient(135deg, #e8f5e9, #d4edda);
+    }
+
+    .product-item .product-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #28a745, #34ce57);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .product-item .product-info h4 {
+        font-size: 0.95rem;
+        color: #333;
+        margin-bottom: 3px;
+    }
+
+    .product-item .product-info p {
+        font-size: 0.8rem;
+        color: #888;
+    }
+
+    .summary-box {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 25px 0;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px dashed #ddd;
+    }
+
+    .summary-row:last-child {
+        border-bottom: none;
+    }
+
+    .summary-row.total {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #28a745;
+        margin-top: 10px;
+        padding-top: 15px;
+        border-top: 2px solid #28a745;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 14px 25px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+
+    .btn-secondary {
+        background: #e9ecef;
+        color: #555;
+    }
+
+    .btn-secondary:hover {
+        background: #ddd;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #28a745, #34ce57);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    }
+
+    .no-products {
+        text-align: center;
+        padding: 40px;
+        color: #888;
+    }
+
+    .no-products i {
+        font-size: 3rem;
+        color: #ddd;
+        margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+
+    /* User dropdown styles */
+    .user-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .user-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #28a745, #34ce57);
+        color: white !important;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .user-btn:hover {
+        background: linear-gradient(135deg, #218838, #28a745);
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        min-width: 180px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        border-radius: 10px;
+        overflow: visible;
+        z-index: 9999;
+        margin-top: 5px;
+        padding: 8px 0;
+    }
+
+    .user-dropdown::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 10px;
+    }
+
+    .user-dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-menu a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        color: #333 !important;
+        text-decoration: none;
+        transition: background 0.2s;
+        cursor: pointer;
+        pointer-events: auto;
+    }
+
+    .dropdown-menu a:hover {
+        background: #f5f5f5;
+        color: #28a745 !important;
+    }
+
+    .dropdown-menu a i {
+        width: 20px;
+        color: #28a745;
+    }
+
+    .nav-menu {
+        overflow: visible !important;
+    }
+
+    #authNav {
+        position: relative;
+        z-index: 100;
+    }
+</style>
+
+<script>
+    const services = {
+        maintenance: { name: 'Bảo Dưỡng Định Kỳ', price: 300000, icon: 'fa-tools' },
+        repair: { name: 'Sửa Chữa', price: 200000, icon: 'fa-wrench' },
+        installation: { name: 'Lắp Đặt Mới', price: 500000, icon: 'fa-home' },
+        warranty: { name: 'Bảo Hành', price: 0, icon: 'fa-shield-alt' }
+    };
+
+    let selectedService = null;
+    let selectedProduct = null;
+    let allProducts = [];
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Kiểm tra đăng nhập - nếu chưa đăng nhập thì yêu cầu đăng nhập
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            alert('Vui lòng đăng nhập để đăng ký lịch hẹn!');
+            window.location.href = './login.html';
+            return;
+        }
+
+        // Kiểm tra đăng nhập và cập nhật navbar
+        updateAuthNav();
+
+        // Lấy service từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const svc = urlParams.get('service');
+
+        if (svc && services[svc]) {
+            selectedService = services[svc];
+            document.getElementById('serviceIcon').className = 'fas ' + selectedService.icon;
+            document.getElementById('serviceName').textContent = selectedService.name;
+            document.getElementById('servicePrice').textContent = formatPrice(selectedService.price);
+            document.getElementById('sumService').textContent = selectedService.name;
+            document.getElementById('sumTotal').textContent = formatPrice(selectedService.price);
+        }
+
+        // Set min date là ngày mai
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('appointmentDate').min = tomorrow.toISOString().split('T')[0];
+
+        // Load thông tin user và sản phẩm từ API
+        fetchUserInfo(currentUser.id);
+
+        // Handle form submit
+        document.getElementById('appointmentForm').addEventListener('submit', handleSubmit);
+
+        // Handle product select change
+        document.getElementById('productSelect').addEventListener('change', function () {
+            const selected = allProducts.find(p => p.id == this.value);
+            if (selected) {
+                selectedProduct = selected;
+                document.getElementById('sumProduct').textContent = selected.name;
+                highlightProduct(selected.id);
+                // Tự động điền địa chỉ sản phẩm vào ô địa chỉ
+                if (selected.address) {
+                    document.getElementById('address').value = selected.address;
+                }
+            }
+        });
+    });
+
+    function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN').format(price) + ' VND';
+    }
+
+    // Lấy thông tin khách hàng từ API
+    function fetchUserInfo(userId) {
+        const authToken = sessionStorage.getItem('authToken');
+        const headers = { 'Content-Type': 'application/json' };
+        if (authToken) {
+            headers['Authorization'] = `Bearer ${ authToken }`;
+        }
+
+        fetch(`/api/user/${ userId }`, { headers })
+            .then(response => response.json())
+            .then(result => {
+                console.log('User API:', result);
+
+                let user = null;
+                if (result.data) {
+                    user = result.data;
+                } else if (result.code === 1 || result.code === 200) {
+                    user = result;
+                }
+
+                if (user) {
+                    // Điền thông tin vào form
+                    if (user.username || user.name || user.fullname) {
+                        document.getElementById('fullName').value = user.username || user.name || user.fullname || '';
+                    }
+                    if (user.phone || user.phone_number) {
+                        document.getElementById('phone').value = user.phone || user.phone_number || '';
+                    }
+                    if (user.address || user.dia_chi) {
+                        document.getElementById('address').value = user.address || user.dia_chi || '';
+                    }
+
+                    // Lấy sản phẩm từ user nếu có
+                    if (user.products || user.listProducts || user.order_products) {
+                        const products = user.products || user.listProducts || user.order_products || [];
+                        if (products.length > 0) {
+                            allProducts = products.map(item => ({
+                                id: item.id || (item.product ? item.product.id : ''),
+                                name: item.product ? item.product.name : (item.name || 'Sản phẩm'),
+                                address: item.address || ''
+                            }));
+                            displayProducts();
+                            return; // Không cần gọi fetchProducts nữa
+                        }
+                    }
+                }
+
+                // Nếu không có sản phẩm trong user, gọi API riêng
+                fetchProducts();
+            })
+            .catch(error => {
+                console.log('Error fetching user info:', error);
+                // Fallback: dùng thông tin từ session
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                if (currentUser.username) document.getElementById('fullName').value = currentUser.username;
+                if (currentUser.phone) document.getElementById('phone').value = currentUser.phone;
+                if (currentUser.address) document.getElementById('address').value = currentUser.address;
+
+                // Vẫn gọi API sản phẩm
+                fetchProducts();
+            });
+    }
+
+    function fetchProducts() {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+        const authToken = sessionStorage.getItem('authToken');
+        const userId = currentUser.id;
+
+        if (!userId) {
+            showNoProducts('Vui lòng đăng nhập để xem sản phẩm của bạn');
+            return;
+        }
+
+        const headers = { 'Content-Type': 'application/json' };
+        if (authToken) {
+            headers['Authorization'] = `Bearer ${ authToken }`;
+        }
+
+        fetch(`/api/user/listProduct/${ userId }`, { headers })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Products API:', result);
+
+                if (result.data && result.data.listProducts && result.data.listProducts.length > 0) {
+                    allProducts = result.data.listProducts.map(item => {
+                        console.log('Product item:', item);
+                        return {
+                            id: item.id || (item.product ? item.product.id : ''),
+                            name: item.product ? item.product.name : (item.name || 'Sản phẩm'),
+                            address: item.address || ''
+                        };
+                    });
+                    console.log('All products with address:', allProducts);
+                    displayProducts();
+                } else {
+                    showNoProducts('Bạn chưa có sản phẩm nào');
+                }
+            })
+            .catch(error => {
+                console.log('Error:', error);
+                showNoProducts('Không thể tải danh sách sản phẩm');
+            });
+    }
+
+    function displayProducts() {
+        // Populate select
+        const select = document.getElementById('productSelect');
+        select.innerHTML = '<option value="">Chọn sản phẩm</option>' +
+            allProducts.map(p => `<option value="${ p.id }">${ p.name }</option>`).join('');
+
+        // Display product list
+        const list = document.getElementById('productList');
+        list.innerHTML = allProducts.map(p => `
+        <div class="product-item" data-id="${ p.id }" onclick="selectProduct(${ p.id })">
+            <div class="product-icon"><i class="fas fa-box"></i></div>
+            <div class="product-info">
+                <h4>${ p.name }</h4>
+                <p>${ p.address || 'Chưa có địa chỉ' }</p>
+            </div>
+        </div>
+    `).join('');
+    }
+
+    function selectProduct(id) {
+        const product = allProducts.find(p => p.id == id);
+        if (product) {
+            selectedProduct = product;
+            document.getElementById('productSelect').value = id;
+            document.getElementById('sumProduct').textContent = product.name;
+            highlightProduct(id);
+            // Tự động điền địa chỉ sản phẩm vào ô địa chỉ
+            if (product.address) {
+                document.getElementById('address').value = product.address;
+            }
+        }
+    }
+
+    function highlightProduct(id) {
+        document.querySelectorAll('.product-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.id == id);
+        });
+    }
+
+    function showNoProducts(message) {
+        document.getElementById('productSelect').innerHTML = '<option value="">Không có sản phẩm</option>';
+        document.getElementById('productList').innerHTML = `
+        <div class="no-products">
+            <i class="fas fa-box-open"></i>
+            <p>${ message }</p>
+            <a href="login.html" style="color:#28a745;">Đăng nhập ngay</a>
+        </div>
+    `;
+    }
+
+    // Format datetime từ "2026-01-05" và "09:00" thành "05/01/2026 09:00"
+    function formatDateTime(dateStr, timeStr) {
+        if (!dateStr) return '';
+        const parts = dateStr.split('-'); // ["2026", "01", "05"]
+        if (parts.length === 3) {
+            return `${ parts[2] }/${ parts[1] }/${ parts[0] } ${ timeStr || '00:00' }`;
+        }
+        return `${ dateStr } ${ timeStr || '00:00' }`;
+    }
+
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        if (!selectedProduct) {
+            alert('Vui lòng chọn sản phẩm!');
+            return;
+        }
+
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+        const urlParams = new URLSearchParams(window.location.search);
+        const serviceId = urlParams.get('service_id');
+
+        const data = {
+            customer: String(currentUser.id),
+            time_star: formatDateTime(document.getElementById('appointmentDate').value, document.getElementById('appointmentTime').value),
+            time_end: formatDateTime(document.getElementById('appointmentDate').value, document.getElementById('appointmentTime').value),
+            type_task: '1',
+            des: document.getElementById('notes').value || 'Đặt lịch từ website',
+            status: '1',
+            priority: '1',
+            staff: '',
+            user_create: String(currentUser.id),
+            product_id: selectedProduct ? String(selectedProduct.id) : ''
+        };
+
+        console.log('Booking data:', data);
+
+        // Gửi lên API
+        fetch('/api/tasks/them', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(result => {
+                console.log('API response:', result);
+                if (result.code === 1 || result.code === 200 || result.success) {
+                    alert('Đặt lịch thành công!\n\nChúng tôi sẽ liên hệ xác nhận trong thời gian sớm nhất.');
+                    window.location.href = './history-booking.html';
+                } else {
+                    alert(result.message || 'Có lỗi xảy ra. Vui lòng thử lại!');
+                }
+            })
+            .catch(error => {
+                console.log('Error:', error);
+                alert('Có lỗi xảy ra. Vui lòng thử lại!');
+            });
+    }
+
+    // Cập nhật navbar theo trạng thái đăng nhập
+    function updateAuthNav() {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        const authNav = document.getElementById('authNav');
+
+        if (currentUser && authNav) {
+            authNav.innerHTML = `
+            <div class="user-dropdown">
+                <a href="#" class="user-btn">
+                    <i class="fas fa-user-circle"></i>
+                    <span>${ currentUser.username || currentUser.phone }</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-menu">
+                    <a href="booking.html"><i class="fas fa-calendar-plus"></i> Đặt lịch</a>
+                    <a href="history-booking.html"><i class="fas fa-calendar-check"></i> Lịch sử đặt lịch</a>
+                    <a href="history-filter.html"><i class="fas fa-filter"></i> Nhật ký thay lõi</a>
+                    <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                </div>
+            </div>
+        `;
+        }
+    }
+
+    function logout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+            sessionStorage.removeItem('currentUser');
+            sessionStorage.removeItem('authToken');
+            sessionStorage.removeItem('loginTime');
+            window.location.href = './index.html';
+        }
+    }
+</script>

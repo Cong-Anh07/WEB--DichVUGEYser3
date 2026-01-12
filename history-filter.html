@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="/src/css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <header class="header">
         <nav class="navbar">
@@ -60,30 +62,30 @@
         </div>
     </footer>
 
-    <script src="/src/js/config.js"></script>
+    <script type="module" src="/src/js/config.js"></script>
     <script>
-    let allProducts = []; // Lưu tất cả sản phẩm để filter
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-        if (!currentUser) {
-            alert('Vui lòng đăng nhập để xem nhật ký!');
-            window.location.href = 'login.html';
-            return;
-        }
-        updateAuthNav();
-        loadProducts(currentUser.id);
-    });
+        let allProducts = []; // Lưu tất cả sản phẩm để filter
 
-    function updateAuthNav() {
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-        const authNav = document.getElementById('authNav');
-        if (currentUser && authNav) {
-            authNav.innerHTML = `
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser) {
+                alert('Vui lòng đăng nhập để xem nhật ký!');
+                window.location.href = './login.html';
+                return;
+            }
+            updateAuthNav();
+            loadProducts(currentUser.id);
+        });
+
+        function updateAuthNav() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const authNav = document.getElementById('authNav');
+            if (currentUser && authNav) {
+                authNav.innerHTML = `
                 <div class="user-dropdown">
                     <a href="#" class="user-btn">
                         <i class="fas fa-user-circle"></i>
-                        <span>${currentUser.username || currentUser.phone}</span>
+                        <span>${ currentUser.username || currentUser.phone }</span>
                         <i class="fas fa-chevron-down"></i>
                     </a>
                     <div class="dropdown-menu">
@@ -94,283 +96,508 @@
                     </div>
                 </div>
             `;
+            }
         }
-    }
 
-    function logout() {
-        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-            sessionStorage.clear();
-            window.location.href = 'index.html';
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                sessionStorage.clear();
+                window.location.href = './index.html';
+            }
         }
-    }
 
-    function loadProducts(userId) {
-        fetch(`/api/user/listProduct/${userId}`)
-            .then(res => res.json())
-            .then(result => {
-                document.getElementById('productsLoading').style.display = 'none';
-                console.log('Products response:', result);
-                
-                let products = [];
-                if (result.data && result.data.listProducts) {
-                    products = result.data.listProducts;
-                }
-                
-                allProducts = products; // Lưu lại để filter
-                
-                if (products.length > 0) {
-                    displayProducts(products);
-                } else {
-                    document.getElementById('emptyState').style.display = 'block';
-                }
-            })
-            .catch(err => {
-                console.log('Error:', err);
-                document.getElementById('productsLoading').innerHTML = `
+        function loadProducts(userId) {
+            fetch(`/api/user/listProduct/${ userId }`)
+                .then(res => res.json())
+                .then(result => {
+                    document.getElementById('productsLoading').style.display = 'none';
+                    console.log('Products response:', result);
+
+                    let products = [];
+                    if (result.data && result.data.listProducts) {
+                        products = result.data.listProducts;
+                    }
+
+                    allProducts = products; // Lưu lại để filter
+
+                    if (products.length > 0) {
+                        displayProducts(products);
+                    } else {
+                        document.getElementById('emptyState').style.display = 'block';
+                    }
+                })
+                .catch(err => {
+                    console.log('Error:', err);
+                    document.getElementById('productsLoading').innerHTML = `
                     <i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i>
                     <p>Không thể tải dữ liệu. Vui lòng thử lại.</p>
                 `;
-            });
-    }
+                });
+        }
 
-    function filterByStatus() {
-        const status = document.getElementById('statusFilter').value;
-        
-        if (status === 'all') {
-            displayProducts(allProducts);
-        } else {
-            // Filter các sản phẩm có order_filter_cores với status tương ứng
-            const filtered = allProducts.map(item => {
-                const filterCores = item.order_filter_cores || [];
-                const filteredCores = filterCores.filter(core => core.status === status);
-                return {
-                    ...item,
-                    order_filter_cores: filteredCores
-                };
-            }).filter(item => item.order_filter_cores.length > 0);
-            
-            if (filtered.length > 0) {
-                displayProducts(filtered);
+        function filterByStatus() {
+            const status = document.getElementById('statusFilter').value;
+
+            if (status === 'all') {
+                displayProducts(allProducts);
             } else {
-                document.getElementById('productsList').innerHTML = `
+                // Filter các sản phẩm có order_filter_cores với status tương ứng
+                const filtered = allProducts.map(item => {
+                    const filterCores = item.order_filter_cores || [];
+                    const filteredCores = filterCores.filter(core => core.status === status);
+                    return {
+                        ...item,
+                        order_filter_cores: filteredCores
+                    };
+                }).filter(item => item.order_filter_cores.length > 0);
+
+                if (filtered.length > 0) {
+                    displayProducts(filtered);
+                } else {
+                    document.getElementById('productsList').innerHTML = `
                     <div class="empty-filter-result">
                         <i class="fas fa-search"></i>
-                        <p>Không có lịch sử thay lõi với trạng thái "${getStatusText(status)}"</p>
+                        <p>Không có lịch sử thay lõi với trạng thái "${ getStatusText(status) }"</p>
                     </div>
                 `;
+                }
             }
         }
-    }
 
-    function getStatusText(status) {
-        const map = {'1': 'Chờ xác nhận', '2': 'Đã xác nhận', '3': 'Hoàn thành'};
-        return map[status] || 'Không xác định';
-    }
+        function getStatusText(status) {
+            const map = { '1': 'Chờ xác nhận', '2': 'Đã xác nhận', '3': 'Hoàn thành' };
+            return map[status] || 'Không xác định';
+        }
 
-    function getStatusClass(status) {
-        const map = {'1': 'pending', '2': 'confirmed', '3': 'completed'};
-        return map[status] || 'pending';
-    }
+        function getStatusClass(status) {
+            const map = { '1': 'pending', '2': 'confirmed', '3': 'completed' };
+            return map[status] || 'pending';
+        }
 
-    function displayProducts(products) {
-        const container = document.getElementById('productsList');
-        container.style.display = 'block';
-        
-        container.innerHTML = products.map(item => {
-            const product = item.product || {};
-            const filterCores = item.order_filter_cores || [];
-            
-            return `
-            <div class="product-filter-card" onclick="window.location.href='product-detail.html?id=${item.id}'" style="cursor:pointer;">
+        function displayProducts(products) {
+            const container = document.getElementById('productsList');
+            container.style.display = 'block';
+
+            container.innerHTML = products.map(item => {
+                const product = item.product || {};
+                const filterCores = item.order_filter_cores || [];
+
+                return `
+            <div class="product-filter-card" onclick="window.location.href='product-detail.html?id=${ item.id }'" style="cursor:pointer;">
                 <div class="product-header">
                     <div class="product-info">
-                        <h3><i class="fas fa-tint"></i> ${product.name || 'Sản phẩm'}</h3>
-                        <p class="product-address"><i class="fas fa-map-marker-alt"></i> ${item.address || 'Chưa có địa chỉ'}</p>
-                        <p class="product-date"><i class="fas fa-calendar"></i> Ngày mua: ${formatDate(item.ngaymua)}</p>
+                        <h3><i class="fas fa-tint"></i> ${ product.name || 'Sản phẩm' }</h3>
+                        <p class="product-address"><i class="fas fa-map-marker-alt"></i> ${ item.address || 'Chưa có địa chỉ' }</p>
+                        <p class="product-date"><i class="fas fa-calendar"></i> Ngày mua: ${ formatDate(item.ngaymua) }</p>
                     </div>
-                    <span class="filter-level">Cấp ${item.filter_core_level || '?'}</span>
+                    <span class="filter-level">Cấp ${ item.filter_core_level || '?' }</span>
                 </div>
                 <div class="filter-cores">
-                    <h4><i class="fas fa-filter"></i> Lịch sử thay lõi (${filterCores.length} lần)</h4>
-                    ${filterCores.length > 0 ? `
+                    <h4><i class="fas fa-filter"></i> Lịch sử thay lõi (${ filterCores.length } lần)</h4>
+                    ${ filterCores.length > 0 ? `
                         <div class="filter-list">
-                            ${filterCores.slice(0, 3).map(core => `
+                            ${ filterCores.slice(0, 3).map(core => `
                                 <div class="filter-item">
                                     <div class="filter-info">
-                                        <span class="filter-name">${core.name || core.filter_core_name || core.ten_loi || 'Lõi lọc'}</span>
-                                        <span class="filter-date">${formatDate(core.replace_date || core.ngay_thay || core.created_at)}</span>
+                                        <span class="filter-name">${ core.name || core.filter_core_name || core.ten_loi || 'Lõi lọc' }</span>
+                                        <span class="filter-date">${ formatDate(core.replace_date || core.ngay_thay || core.created_at) }</span>
                                     </div>
-                                    <span class="filter-status status-${getStatusClass(core.status)}">${getStatusText(core.status)}</span>
+                                    <span class="filter-status status-${ getStatusClass(core.status) }">${ getStatusText(core.status) }</span>
                                 </div>
-                            `).join('')}
-                            ${filterCores.length > 3 ? `<p class="more-items">+ ${filterCores.length - 3} lần thay khác - Click để xem chi tiết</p>` : ''}
+                            `).join('') }
+                            ${ filterCores.length > 3 ? `<p class="more-items">+ ${ filterCores.length - 3 } lần thay khác - Click để xem chi tiết</p>` : '' }
                         </div>
-                    ` : '<p class="no-filter">Chưa có lịch sử thay lõi</p>'}
+                    ` : '<p class="no-filter">Chưa có lịch sử thay lõi</p>' }
                 </div>
                 <div class="card-footer">
                     <span class="view-detail"><i class="fas fa-eye"></i> Xem chi tiết sản phẩm</span>
                 </div>
             </div>
             `;
-        }).join('');
-    }
+            }).join('');
+        }
 
-    function formatDate(dateStr) {
-        if (!dateStr) return 'N/A';
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('vi-VN');
-    }
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('vi-VN');
+        }
     </script>
 
     <style>
-    .history-main { padding: 100px 0 60px; min-height: 70vh; background: #f8f9fa; }
-    .page-header { text-align: center; margin-bottom: 40px; }
-    .page-header h1 { font-size: 2rem; color: #1a1a2e; margin-bottom: 10px; }
-    .page-header h1 i { color: #28a745; margin-right: 10px; }
-    .page-header p { color: #666; }
-    
-    .history-tabs { display: flex; gap: 10px; margin-bottom: 30px; justify-content: center; }
-    .history-tabs .tab {
-        padding: 12px 24px;
-        background: white;
-        border-radius: 25px;
-        text-decoration: none;
-        color: #666;
-        font-weight: 500;
-        transition: all 0.3s;
-        border: 2px solid #e0e0e0;
-    }
-    .history-tabs .tab.active, .history-tabs .tab:hover {
-        background: #28a745;
-        color: white;
-        border-color: #28a745;
-    }
-    
-    /* Filter toolbar */
-    .filter-toolbar {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 25px;
-        padding: 15px 20px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    .filter-toolbar label {
-        font-weight: 500;
-        color: #333;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .filter-toolbar label i { color: #28a745; }
-    .status-filter {
-        padding: 10px 20px;
-        border: 2px solid #e0e0e0;
-        border-radius: 25px;
-        font-size: 0.95rem;
-        cursor: pointer;
-        background: white;
-        min-width: 180px;
-        transition: all 0.3s;
-    }
-    .status-filter:focus {
-        outline: none;
-        border-color: #28a745;
-    }
-    .empty-filter-result {
-        text-align: center;
-        padding: 50px 20px;
-        background: white;
-        border-radius: 15px;
-        color: #666;
-    }
-    .empty-filter-result i {
-        font-size: 2.5rem;
-        color: #ccc;
-        margin-bottom: 15px;
-    }
-    
-    .loading-state, .empty-state { text-align: center; padding: 60px 20px; }
-    .loading-state i, .empty-state i { font-size: 3rem; color: #28a745; margin-bottom: 20px; }
-    .empty-state i { color: #ccc; }
-    .empty-state h3 { color: #333; margin-bottom: 10px; }
-    .empty-state p { color: #666; }
-    
-    .products-filter-list { display: grid; gap: 25px; }
-    .product-filter-card {
-        background: white;
-        border-radius: 20px;
-        padding: 25px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        transition: all 0.3s;
-    }
-    .product-filter-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-    }
-    .product-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-    .product-info h3 { color: #1a1a2e; font-size: 1.2rem; margin-bottom: 8px; }
-    .product-info h3 i { color: #28a745; margin-right: 8px; }
-    .product-address, .product-date { color: #666; font-size: 0.9rem; margin-bottom: 5px; }
-    .product-address i, .product-date i { width: 20px; color: #28a745; }
-    .filter-level {
-        background: linear-gradient(135deg, #28a745, #34ce57);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-    .filter-cores h4 { color: #333; font-size: 1rem; margin-bottom: 15px; }
-    .filter-cores h4 i { color: #28a745; margin-right: 8px; }
-    .filter-list { display: grid; gap: 10px; }
-    .filter-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 15px;
-        background: #f8f9fa;
-        border-radius: 10px;
-        border-left: 3px solid #28a745;
-    }
-    .filter-info {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-    .filter-name { color: #333; font-weight: 500; }
-    .filter-date { color: #666; font-size: 0.85rem; }
-    .filter-status {
-        padding: 5px 12px;
-        border-radius: 15px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-    .filter-status.status-pending { background: #fff3cd; color: #856404; }
-    .filter-status.status-confirmed { background: #cce5ff; color: #004085; }
-    .filter-status.status-completed { background: #d4edda; color: #155724; }
-    .no-filter { color: #999; font-style: italic; padding: 15px; text-align: center; background: #f8f9fa; border-radius: 10px; }
-    .more-items { color: #28a745; font-size: 0.9rem; text-align: center; margin-top: 10px; font-weight: 500; }
-    .card-footer { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; text-align: right; }
-    .view-detail { color: #28a745; font-weight: 500; font-size: 0.9rem; }
-    .view-detail i { margin-right: 5px; }
-    
-    /* Dropdown styles */
-    .user-dropdown { position: relative; }
-    .user-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, #28a745, #34ce57); color: white !important; border-radius: 25px; text-decoration: none; font-weight: 500; }
-    .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: white; min-width: 180px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-radius: 10px; z-index: 9999; margin-top: 5px; padding: 8px 0; }
-    .user-dropdown:hover .dropdown-menu { display: block; }
-    .dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #333 !important; text-decoration: none; }
-    .dropdown-menu a:hover { background: #f5f5f5; color: #28a745 !important; }
-    .dropdown-menu a i { width: 20px; color: #28a745; }
-    .dropdown-submenu { position: relative; }
-    .submenu-toggle { justify-content: space-between; }
-    .submenu-arrow { font-size: 0.7rem; }
-    .submenu { display: none; position: absolute; left: 100%; top: 0; background: white; min-width: 180px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-radius: 10px; padding: 8px 0; margin-left: 5px; }
-    .dropdown-submenu:hover .submenu { display: block; }
+        .history-main {
+            padding: 100px 0 60px;
+            min-height: 70vh;
+            background: #f8f9fa;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        .page-header h1 i {
+            color: #28a745;
+            margin-right: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        .history-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .history-tabs .tab {
+            padding: 12px 24px;
+            background: white;
+            border-radius: 25px;
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: 2px solid #e0e0e0;
+        }
+
+        .history-tabs .tab.active,
+        .history-tabs .tab:hover {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        /* Filter toolbar */
+        .filter-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-toolbar label {
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-toolbar label i {
+            color: #28a745;
+        }
+
+        .status-filter {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            background: white;
+            min-width: 180px;
+            transition: all 0.3s;
+        }
+
+        .status-filter:focus {
+            outline: none;
+            border-color: #28a745;
+        }
+
+        .empty-filter-result {
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 15px;
+            color: #666;
+        }
+
+        .empty-filter-result i {
+            font-size: 2.5rem;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .loading-state,
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-state i,
+        .empty-state i {
+            font-size: 3rem;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .empty-state i {
+            color: #ccc;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+        }
+
+        .products-filter-list {
+            display: grid;
+            gap: 25px;
+        }
+
+        .product-filter-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .product-filter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-info h3 {
+            color: #1a1a2e;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .product-info h3 i {
+            color: #28a745;
+            margin-right: 8px;
+        }
+
+        .product-address,
+        .product-date {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .product-address i,
+        .product-date i {
+            width: 20px;
+            color: #28a745;
+        }
+
+        .filter-level {
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .filter-cores h4 {
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .filter-cores h4 i {
+            color: #28a745;
+            margin-right: 8px;
+        }
+
+        .filter-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .filter-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 3px solid #28a745;
+        }
+
+        .filter-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-name {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .filter-date {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .filter-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .filter-status.status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .filter-status.status-confirmed {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .filter-status.status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .no-filter {
+            color: #999;
+            font-style: italic;
+            padding: 15px;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .more-items {
+            color: #28a745;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .card-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #eee;
+            text-align: right;
+        }
+
+        .view-detail {
+            color: #28a745;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .view-detail i {
+            margin-right: 5px;
+        }
+
+        /* Dropdown styles */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            color: white !important;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            z-index: 9999;
+            margin-top: 5px;
+            padding: 8px 0;
+        }
+
+        .user-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333 !important;
+            text-decoration: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f5f5f5;
+            color: #28a745 !important;
+        }
+
+        .dropdown-menu a i {
+            width: 20px;
+            color: #28a745;
+        }
+
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .submenu-toggle {
+            justify-content: space-between;
+        }
+
+        .submenu-arrow {
+            font-size: 0.7rem;
+        }
+
+        .submenu {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 8px 0;
+            margin-left: 5px;
+        }
+
+        .dropdown-submenu:hover .submenu {
+            display: block;
+        }
     </style>
 </body>
+
 </html>

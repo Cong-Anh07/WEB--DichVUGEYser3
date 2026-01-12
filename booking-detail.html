@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +9,13 @@
     <link rel="stylesheet" href="/src/css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <header class="header">
         <nav class="navbar">
             <div class="nav-container">
-                <div class="logo"><a href="index.html"><img src="/public/images/logo.png" alt="Nanogeyser Logo"></a></div>
+                <div class="logo"><a href="index.html"><img src="/public/images/logo.png" alt="Nanogeyser Logo"></a>
+                </div>
                 <ul class="nav-menu">
                     <li><a href="index.html">Trang Chủ</a></li>
                     <li><a href="booking.html">Đặt Lịch</a></li>
@@ -26,7 +29,7 @@
     <main class="detail-main">
         <div class="container">
             <a href="history-booking.html" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại lịch sử</a>
-            
+
             <div id="detailLoading" class="loading-state">
                 <i class="fas fa-spinner fa-spin"></i>
                 <p>Đang tải chi tiết...</p>
@@ -90,150 +93,152 @@
 
     <footer class="footer">
         <div class="container">
-            <div class="footer-bottom"><p>&copy; 2024 Nanogeyser. Tất cả quyền được bảo lưu.</p></div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nanogeyser. Tất cả quyền được bảo lưu.</p>
+            </div>
         </div>
     </footer>
 
-    <script src="/src/js/config.js"></script>
+    <script type="module" src="/src/js/config.js"></script>
     <script>
-    const BASE_URL = import.meta.env.VITE_API_URL;
+        const BASE_URL = import.meta.env.VITE_API_URL;
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-        if (!currentUser) {
-            window.location.href = 'login.html';
-            return;
-        }
-        updateAuthNav();
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const taskId = urlParams.get('id');
-        
-        if (taskId) {
-            loadTaskDetail(taskId);
-        } else {
-            showError();
-        }
-    });
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = './login.html';
+                return;
+            }
+            updateAuthNav();
 
-    function loadTaskDetail(id) {
-        fetch(`/api/tasks/${id}`)
-            .then(res => res.json())
-            .then(result => {
-                console.log('Task detail:', result);
-                document.getElementById('detailLoading').style.display = 'none';
-                
-                // API trả về result.data trực tiếp
-                let task = result.data || result;
-                
-                if (task && task.id) {
-                    displayDetail(task);
-                } else {
-                    showError();
-                }
-            })
-            .catch(err => {
-                console.log('Error:', err);
-                document.getElementById('detailLoading').style.display = 'none';
+            const urlParams = new URLSearchParams(window.location.search);
+            const taskId = urlParams.get('id');
+
+            if (taskId) {
+                loadTaskDetail(taskId);
+            } else {
                 showError();
-            });
-    }
-
-    function displayDetail(task) {
-        document.getElementById('detailContent').style.display = 'block';
-        
-        document.getElementById('bookingId').textContent = task.id || '';
-        document.getElementById('timeValue').textContent = formatDateTime(task.time_star) || 'N/A';
-        document.getElementById('taskName').textContent = task.name || 'N/A';
-        
-        // Sản phẩm - lấy từ product_info.product.name
-        let productName = 'N/A';
-        if (task.product_info && task.product_info.product && task.product_info.product.name) {
-            productName = task.product_info.product.name;
-        } else if (task.product_info && task.product_info.name) {
-            productName = task.product_info.name;
-        }
-        document.getElementById('productName').textContent = productName;
-        
-        // Nội dung/mô tả
-        document.getElementById('description').textContent = task.des || task.description || '';
-        
-        // Địa chỉ
-        const customer = task.customer || {};
-        document.getElementById('address').textContent = customer.address || task.address || '';
-        
-        // Trạng thái
-        const statusEl = document.getElementById('status');
-        statusEl.textContent = getStatusText(task.status);
-        statusEl.className = 'value status-' + getStatusClass(task.status);
-        
-        // Kỹ thuật viên
-        const staff = task.staff || {};
-        document.getElementById('staffName').textContent = staff.username || staff.name || '';
-        document.getElementById('staffPhone').textContent = staff.phone || '';
-        
-        // Thông báo
-        document.getElementById('notification').textContent = task.noti || task.notification || '';
-        
-        // Media (hình ảnh/video)
-        displayMedia(task.images || task.media || []);
-    }
-
-    function displayMedia(media) {
-        const container = document.getElementById('mediaGallery');
-        if (!media || media.length === 0) {
-            container.innerHTML = '<span class="no-media">Chưa có hình ảnh</span>';
-            return;
-        }
-        
-        container.innerHTML = media.map(item => {
-            let url = item.url || item.image || item;
-            if (url && !url.startsWith('http')) {
-                url = BASE_URL + url;
             }
-            return `<img src="${url}" alt="Hình ảnh" onclick="window.open('${url}', '_blank')">`;
-        }).join('');
-    }
+        });
 
-    function formatDateTime(dateStr) {
-        if (!dateStr || dateStr === '0000-00-00 00:00:00') return 'N/A';
-        try {
-            const parts = dateStr.split(' ');
-            const datePart = parts[0].split('-');
-            const timePart = parts[1] || '00:00:00';
-            if (datePart.length === 3) {
-                return `${datePart[2]}/${datePart[1]}/${datePart[0]} ${timePart}`;
-            }
-            return dateStr;
-        } catch (e) {
-            return dateStr;
+        function loadTaskDetail(id) {
+            fetch(`/api/tasks/${ id }`)
+                .then(res => res.json())
+                .then(result => {
+                    console.log('Task detail:', result);
+                    document.getElementById('detailLoading').style.display = 'none';
+
+                    // API trả về result.data trực tiếp
+                    let task = result.data || result;
+
+                    if (task && task.id) {
+                        displayDetail(task);
+                    } else {
+                        showError();
+                    }
+                })
+                .catch(err => {
+                    console.log('Error:', err);
+                    document.getElementById('detailLoading').style.display = 'none';
+                    showError();
+                });
         }
-    }
 
-    function getStatusClass(status) {
-        const map = {'1': 'pending', '2': 'confirmed', '3': 'completed', '4': 'cancelled'};
-        return map[status] || 'pending';
-    }
+        function displayDetail(task) {
+            document.getElementById('detailContent').style.display = 'block';
 
-    function getStatusText(status) {
-        const map = {'1': 'Chờ xác nhận', '2': 'Đã xác nhận', '3': 'Hoàn thành', '4': 'Hủy'};
-        return map[status] || 'Chờ xử lý';
-    }
+            document.getElementById('bookingId').textContent = task.id || '';
+            document.getElementById('timeValue').textContent = formatDateTime(task.time_star) || 'N/A';
+            document.getElementById('taskName').textContent = task.name || 'N/A';
 
-    function showError() {
-        document.getElementById('detailLoading').style.display = 'none';
-        document.getElementById('errorState').style.display = 'block';
-    }
+            // Sản phẩm - lấy từ product_info.product.name
+            let productName = 'N/A';
+            if (task.product_info && task.product_info.product && task.product_info.product.name) {
+                productName = task.product_info.product.name;
+            } else if (task.product_info && task.product_info.name) {
+                productName = task.product_info.name;
+            }
+            document.getElementById('productName').textContent = productName;
 
-    function updateAuthNav() {
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-        const authNav = document.getElementById('authNav');
-        if (currentUser && authNav) {
-            authNav.innerHTML = `
+            // Nội dung/mô tả
+            document.getElementById('description').textContent = task.des || task.description || '';
+
+            // Địa chỉ
+            const customer = task.customer || {};
+            document.getElementById('address').textContent = customer.address || task.address || '';
+
+            // Trạng thái
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = getStatusText(task.status);
+            statusEl.className = 'value status-' + getStatusClass(task.status);
+
+            // Kỹ thuật viên
+            const staff = task.staff || {};
+            document.getElementById('staffName').textContent = staff.username || staff.name || '';
+            document.getElementById('staffPhone').textContent = staff.phone || '';
+
+            // Thông báo
+            document.getElementById('notification').textContent = task.noti || task.notification || '';
+
+            // Media (hình ảnh/video)
+            displayMedia(task.images || task.media || []);
+        }
+
+        function displayMedia(media) {
+            const container = document.getElementById('mediaGallery');
+            if (!media || media.length === 0) {
+                container.innerHTML = '<span class="no-media">Chưa có hình ảnh</span>';
+                return;
+            }
+
+            container.innerHTML = media.map(item => {
+                let url = item.url || item.image || item;
+                if (url && !url.startsWith('http')) {
+                    url = BASE_URL + url;
+                }
+                return `<img src="${ url }" alt="Hình ảnh" onclick="window.open('${ url }', '_blank')">`;
+            }).join('');
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr || dateStr === '0000-00-00 00:00:00') return 'N/A';
+            try {
+                const parts = dateStr.split(' ');
+                const datePart = parts[0].split('-');
+                const timePart = parts[1] || '00:00:00';
+                if (datePart.length === 3) {
+                    return `${ datePart[2] }/${ datePart[1] }/${ datePart[0] } ${ timePart }`;
+                }
+                return dateStr;
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function getStatusClass(status) {
+            const map = { '1': 'pending', '2': 'confirmed', '3': 'completed', '4': 'cancelled' };
+            return map[status] || 'pending';
+        }
+
+        function getStatusText(status) {
+            const map = { '1': 'Chờ xác nhận', '2': 'Đã xác nhận', '3': 'Hoàn thành', '4': 'Hủy' };
+            return map[status] || 'Chờ xử lý';
+        }
+
+        function showError() {
+            document.getElementById('detailLoading').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        function updateAuthNav() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const authNav = document.getElementById('authNav');
+            if (currentUser && authNav) {
+                authNav.innerHTML = `
                 <div class="user-dropdown">
                     <a href="#" class="user-btn">
                         <i class="fas fa-user-circle"></i>
-                        <span>${currentUser.username || currentUser.phone}</span>
+                        <span>${ currentUser.username || currentUser.phone }</span>
                         <i class="fas fa-chevron-down"></i>
                     </a>
                     <div class="dropdown-menu">
@@ -244,62 +249,233 @@
                     </div>
                 </div>
             `;
+            }
         }
-    }
 
-    function logout() {
-        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-            sessionStorage.clear();
-            window.location.href = 'index.html';
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                sessionStorage.clear();
+                window.location.href = './index.html';
+            }
         }
-    }
     </script>
 
     <style>
-    .detail-main { padding: 100px 0 60px; min-height: 70vh; background: #f8f9fa; }
-    .back-link { display: inline-flex; align-items: center; gap: 8px; color: #28a745; text-decoration: none; font-weight: 500; margin-bottom: 20px; }
-    .back-link:hover { text-decoration: underline; }
-    
-    .loading-state, .error-state { text-align: center; padding: 60px 20px; }
-    .loading-state i { font-size: 3rem; color: #28a745; }
-    .error-state i { font-size: 3rem; color: #dc3545; margin-bottom: 15px; }
-    
-    .detail-card { background: white; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
-    .detail-header { background: linear-gradient(135deg, #f5a623, #f7b731); padding: 20px 25px; color: white; }
-    .detail-header h1 { font-size: 1.3rem; margin: 0; display: flex; align-items: center; gap: 10px; }
-    
-    .detail-body { padding: 0; }
-    .detail-row { display: flex; padding: 15px 25px; border-bottom: 1px solid #f0f0f0; }
-    .detail-row.border-top { border-top: 2px solid #f5a623; }
-    .detail-row .label { width: 140px; font-weight: 600; color: #333; flex-shrink: 0; }
-    .detail-row .value { flex: 1; color: #555; }
-    .detail-row .value.highlight { color: #f5a623; font-weight: 600; }
-    .detail-row .value.status-pending { color: #856404; }
-    .detail-row .value.status-confirmed { color: #004085; }
-    .detail-row .value.status-completed { color: #155724; }
-    .detail-row .value.status-cancelled { color: #dc3545; }
-    
-    .media-gallery { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-    .media-gallery img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid #eee; }
-    .media-gallery img:hover { border-color: #f5a623; }
-    .no-media { color: #999; font-style: italic; }
-    
-    /* Dropdown */
-    .user-dropdown { position: relative; }
-    .user-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, #28a745, #34ce57); color: white !important; border-radius: 25px; text-decoration: none; font-weight: 500; }
-    .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: white; min-width: 180px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-radius: 10px; z-index: 9999; margin-top: 5px; padding: 8px 0; }
-    .user-dropdown:hover .dropdown-menu { display: block; }
-    .dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #333 !important; text-decoration: none; }
-    .dropdown-menu a:hover { background: #f5f5f5; }
-    .dropdown-menu a i { width: 20px; color: #28a745; }
-    .dropdown-submenu { position: relative; }
-    .submenu { display: none; position: absolute; left: 100%; top: 0; background: white; min-width: 180px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-radius: 10px; padding: 8px 0; margin-left: 5px; }
-    .dropdown-submenu:hover .submenu { display: block; }
-    
-    @media (max-width: 576px) {
-        .detail-row { flex-direction: column; gap: 5px; }
-        .detail-row .label { width: 100%; }
-    }
+        .detail-main {
+            padding: 100px 0 60px;
+            min-height: 70vh;
+            background: #f8f9fa;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #28a745;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .loading-state,
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-state i {
+            font-size: 3rem;
+            color: #28a745;
+        }
+
+        .error-state i {
+            font-size: 3rem;
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .detail-header {
+            background: linear-gradient(135deg, #f5a623, #f7b731);
+            padding: 20px 25px;
+            color: white;
+        }
+
+        .detail-header h1 {
+            font-size: 1.3rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-body {
+            padding: 0;
+        }
+
+        .detail-row {
+            display: flex;
+            padding: 15px 25px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-row.border-top {
+            border-top: 2px solid #f5a623;
+        }
+
+        .detail-row .label {
+            width: 140px;
+            font-weight: 600;
+            color: #333;
+            flex-shrink: 0;
+        }
+
+        .detail-row .value {
+            flex: 1;
+            color: #555;
+        }
+
+        .detail-row .value.highlight {
+            color: #f5a623;
+            font-weight: 600;
+        }
+
+        .detail-row .value.status-pending {
+            color: #856404;
+        }
+
+        .detail-row .value.status-confirmed {
+            color: #004085;
+        }
+
+        .detail-row .value.status-completed {
+            color: #155724;
+        }
+
+        .detail-row .value.status-cancelled {
+            color: #dc3545;
+        }
+
+        .media-gallery {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .media-gallery img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #eee;
+        }
+
+        .media-gallery img:hover {
+            border-color: #f5a623;
+        }
+
+        .no-media {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Dropdown */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            color: white !important;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            z-index: 9999;
+            margin-top: 5px;
+            padding: 8px 0;
+        }
+
+        .user-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333 !important;
+            text-decoration: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f5f5f5;
+        }
+
+        .dropdown-menu a i {
+            width: 20px;
+            color: #28a745;
+        }
+
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .submenu {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 8px 0;
+            margin-left: 5px;
+        }
+
+        .dropdown-submenu:hover .submenu {
+            display: block;
+        }
+
+        @media (max-width: 576px) {
+            .detail-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .detail-row .label {
+                width: 100%;
+            }
+        }
     </style>
 </body>
+
 </html>

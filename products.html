@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +9,28 @@
     <link rel="stylesheet" href="/src/css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .products-page { padding-top: 100px; min-height: 100vh; background: #f5f6fa; }
-        .page-header { text-align: center; margin-bottom: 40px; }
-        .page-header h1 { color: #28a745; font-size: 2.5rem; margin-bottom: 10px; }
-        .page-header p { color: #666; font-size: 1.1rem; }
+        .products-page {
+            padding-top: 100px;
+            min-height: 100vh;
+            background: #f5f6fa;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            color: #28a745;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -20,17 +39,20 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+
         .product-card {
             background: white;
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s, box-shadow 0.3s;
         }
+
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
         }
+
         .product-image {
             height: 200px;
             background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
@@ -39,17 +61,23 @@
             justify-content: center;
             overflow: hidden;
         }
+
         .product-image img {
             max-width: 100%;
             max-height: 100%;
             object-fit: cover;
         }
+
         .product-image .no-image {
             font-size: 4rem;
             color: #28a745;
             opacity: 0.5;
         }
-        .product-info { padding: 20px; }
+
+        .product-info {
+            padding: 20px;
+        }
+
         .product-name {
             font-size: 1.1rem;
             font-weight: 600;
@@ -60,12 +88,14 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+
         .product-price {
             font-size: 1.3rem;
             font-weight: 700;
             color: #28a745;
             margin-bottom: 10px;
         }
+
         .product-desc {
             font-size: 0.9rem;
             color: #666;
@@ -75,13 +105,15 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-</style>
+    </style>
 </head>
+
 <body>
     <header class="header">
         <nav class="navbar">
             <div class="nav-container">
-                <div class="logo"><a href="index.html"><img src="/public/images/logo.png" alt="Nanogeyser Logo"></a></div>
+                <div class="logo"><a href="index.html"><img src="/public/images/logo.png" alt="Nanogeyser Logo"></a>
+                </div>
                 <ul class="nav-menu">
                     <li><a href="index.html">Trang Chủ</a></li>
                     <li><a href="products.html">Sản Phẩm</a></li>
@@ -110,6 +142,7 @@
         </div>
     </main>
 </body>
+
 </html>
 
 <style>
@@ -124,10 +157,12 @@
         cursor: pointer;
         transition: all 0.3s;
     }
+
     .product-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
     }
+
     .product-category {
         display: inline-block;
         padding: 4px 12px;
@@ -137,33 +172,40 @@
         font-size: 0.8rem;
         margin-bottom: 10px;
     }
+
     .product-stock {
         font-size: 0.85rem;
         color: #888;
     }
-    .product-stock.in-stock { color: #28a745; }
-    .product-stock.out-stock { color: #dc3545; }
+
+    .product-stock.in-stock {
+        color: #28a745;
+    }
+
+    .product-stock.out-stock {
+        color: #dc3545;
+    }
 </style>
 
-<script src="/src/js/config.js"></script>
-<script src="/src/js/auth.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    updateAuthNav();
-    fetchProducts();
-});
+<script type="module" src="/src/js/config.js"></script>
+<script type="module" src="/src/js/auth.js"></script>
+<script type="module">
+    document.addEventListener('DOMContentLoaded', function () {
+        updateAuthNav();
+        fetchProducts();
+    });
 
-function updateAuthNav() {
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-    const authNav = document.getElementById('authNav');
-    const registerNav = document.getElementById('registerNav');
-    
-    if (currentUser && authNav) {
-        authNav.innerHTML = `
+    function updateAuthNav() {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        const authNav = document.getElementById('authNav');
+        const registerNav = document.getElementById('registerNav');
+
+        if (currentUser && authNav) {
+            authNav.innerHTML = `
             <div class="user-dropdown">
                 <a href="#" class="user-btn">
                     <i class="fas fa-user-circle"></i>
-                    <span>${currentUser.username || currentUser.phone}</span>
+                    <span>${ currentUser.username || currentUser.phone }</span>
                     <i class="fas fa-chevron-down"></i>
                 </a>
                 <div class="dropdown-menu">
@@ -174,59 +216,59 @@ function updateAuthNav() {
                 </div>
             </div>
         `;
-        if (registerNav) registerNav.style.display = 'none';
+            if (registerNav) registerNav.style.display = 'none';
+        }
     }
-}
 
-function logout() {
-    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-        sessionStorage.removeItem('currentUser');
-        sessionStorage.removeItem('authToken');
-        sessionStorage.removeItem('loginTime');
-        window.location.href = 'index.html';
+    function logout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+            sessionStorage.removeItem('currentUser');
+            sessionStorage.removeItem('authToken');
+            sessionStorage.removeItem('loginTime');
+            window.location.href = './index.html';
+        }
     }
-}
 
-function fetchProducts() {
-    // Lấy user_id từ session nếu đã đăng nhập
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-    const userId = currentUser ? currentUser.id : 8968;
-    
-    // Gọi API /user/listProduct/{user_id}
-    fetch(`/api/user/listProduct/${userId}`)
-        .then(response => response.json())
-        .then(result => {
-            console.log('API Response:', result);
-            document.getElementById('loading').style.display = 'none';
-            
-            // API trả về: { code: 200, data: { listProducts: [...] } }
-            // Mỗi item có: { product: { id, name, ... }, address, ... }
-            let products = [];
-            if (result.data && result.data.listProducts) {
-                products = result.data.listProducts.map(item => ({
-                    id: item.product ? item.product.id : item.id,
-                    name: item.product ? item.product.name : (item.name || 'Sản phẩm'),
-                    address: item.address || '',
-                    order_type: item.order_type_label || '',
-                    ngaymua: item.ngaymua || ''
-                }));
-            }
-            
-            if (products.length > 0) {
-                displayProducts(products);
-            } else {
+    function fetchProducts() {
+        // Lấy user_id từ session nếu đã đăng nhập
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        const userId = currentUser ? currentUser.id : 8968;
+
+        // Gọi API /user/listProduct/{user_id}
+        fetch(`/api/user/listProduct/${ userId }`)
+            .then(response => response.json())
+            .then(result => {
+                console.log('API Response:', result);
+                document.getElementById('loading').style.display = 'none';
+
+                // API trả về: { code: 200, data: { listProducts: [...] } }
+                // Mỗi item có: { product: { id, name, ... }, address, ... }
+                let products = [];
+                if (result.data && result.data.listProducts) {
+                    products = result.data.listProducts.map(item => ({
+                        id: item.product ? item.product.id : item.id,
+                        name: item.product ? item.product.name : (item.name || 'Sản phẩm'),
+                        address: item.address || '',
+                        order_type: item.order_type_label || '',
+                        ngaymua: item.ngaymua || ''
+                    }));
+                }
+
+                if (products.length > 0) {
+                    displayProducts(products);
+                } else {
+                    showNoProducts();
+                }
+            })
+            .catch(error => {
+                console.log('Error:', error);
                 showNoProducts();
-            }
-        })
-        .catch(error => {
-            console.log('Error:', error);
-            showNoProducts();
-        });
-}
+            });
+    }
 
-function showNoProducts() {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('productsGrid').innerHTML = `
+    function showNoProducts() {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('productsGrid').innerHTML = `
         <div style="grid-column: 1/-1; text-align:center; padding:60px;">
             <i class="fas fa-box-open" style="font-size:4rem; color:#ccc; margin-bottom:20px;"></i>
             <h3 style="color:#666; margin-bottom:10px;">Chưa có sản phẩm nào</h3>
@@ -234,51 +276,120 @@ function showNoProducts() {
             <a href="login.html" style="display:inline-block; margin-top:20px; padding:12px 30px; background:#28a745; color:white; border-radius:10px; text-decoration:none;">Đăng nhập</a>
         </div>
     `;
-}
+    }
 
-function displayProducts(products) {
-    const grid = document.getElementById('productsGrid');
-    grid.innerHTML = '';
-    
-    products.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
+    function displayProducts(products) {
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = '';
+
+        products.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
             <div class="product-image">
                 <i class="fas fa-box no-image"></i>
             </div>
             <div class="product-info">
-                ${product.order_type ? `<span class="product-category">${product.order_type}</span>` : ''}
-                <h3 class="product-name">${product.name}</h3>
-                ${product.address ? `<p class="product-desc"><i class="fas fa-map-marker-alt"></i> ${product.address}</p>` : ''}
-                ${product.ngaymua ? `<p class="product-stock in-stock"><i class="fas fa-calendar"></i> Ngày mua: ${product.ngaymua.split(' ')[0]}</p>` : ''}
-                <button class="product-btn" onclick="bookService('${product.name}')">
+                ${ product.order_type ? `<span class="product-category">${ product.order_type }</span>` : '' }
+                <h3 class="product-name">${ product.name }</h3>
+                ${ product.address ? `<p class="product-desc"><i class="fas fa-map-marker-alt"></i> ${ product.address }</p>` : '' }
+                ${ product.ngaymua ? `<p class="product-stock in-stock"><i class="fas fa-calendar"></i> Ngày mua: ${ product.ngaymua.split(' ')[0] }</p>` : '' }
+                <button class="product-btn" onclick="bookService('${ product.name }')">
                     <i class="fas fa-calendar-plus"></i> Đặt lịch bảo dưỡng
                 </button>
             </div>
         `;
-        grid.appendChild(card);
-    });
-}
-
-function bookService(name) {
-    if (confirm('Bạn muốn đặt lịch bảo dưỡng cho: ' + name + '?')) {
-        window.location.href = 'booking.html';
+            grid.appendChild(card);
+        });
     }
-}
+
+    function bookService(name) {
+        if (confirm('Bạn muốn đặt lịch bảo dưỡng cho: ' + name + '?')) {
+            window.location.href = './booking.html';
+        }
+    }
 </script>
 
 <style>
-/* User dropdown styles */
-.user-dropdown { position: relative; display: inline-block; }
-.user-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, #28a745, #34ce57); color: white !important; border-radius: 25px; text-decoration: none; font-weight: 500; cursor: pointer; }
-.user-btn:hover { background: linear-gradient(135deg, #218838, #28a745); }
-.dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: white; min-width: 180px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-radius: 10px; overflow: visible; z-index: 9999; margin-top: 5px; padding: 8px 0; }
-.user-dropdown::after { content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 10px; }
-.user-dropdown:hover .dropdown-menu { display: block; }
-.dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #333 !important; text-decoration: none; transition: background 0.2s; cursor: pointer; pointer-events: auto; }
-.dropdown-menu a:hover { background: #f5f5f5; color: #28a745 !important; }
-.dropdown-menu a i { width: 20px; color: #28a745; }
-.nav-menu { overflow: visible !important; }
-#authNav { position: relative; z-index: 100; }
+    /* User dropdown styles */
+    .user-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .user-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #28a745, #34ce57);
+        color: white !important;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .user-btn:hover {
+        background: linear-gradient(135deg, #218838, #28a745);
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        min-width: 180px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        border-radius: 10px;
+        overflow: visible;
+        z-index: 9999;
+        margin-top: 5px;
+        padding: 8px 0;
+    }
+
+    .user-dropdown::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 10px;
+    }
+
+    .user-dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-menu a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        color: #333 !important;
+        text-decoration: none;
+        transition: background 0.2s;
+        cursor: pointer;
+        pointer-events: auto;
+    }
+
+    .dropdown-menu a:hover {
+        background: #f5f5f5;
+        color: #28a745 !important;
+    }
+
+    .dropdown-menu a i {
+        width: 20px;
+        color: #28a745;
+    }
+
+    .nav-menu {
+        overflow: visible !important;
+    }
+
+    #authNav {
+        position: relative;
+        z-index: 100;
+    }
 </style>

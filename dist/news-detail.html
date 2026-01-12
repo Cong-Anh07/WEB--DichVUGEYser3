@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Tin Tức - Nanogeyser</title>
+    <link rel="icon" href="./assets/logo-web-CIp09qxk.png" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/config-CAO_t3db.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/styles-DXe8NeaQ.css">
+</head>
+
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="index.html"><img src="./assets/logo-BPhqW2iW.png" alt="Nanogeyser Logo"></a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Trang Chủ</a></li>
+                    <li><a href="booking.html">Đặt Lịch</a></li>
+                    <li><a href="index.html#contact">Liên Hệ</a></li>
+                    <li id="authNav"><a href="login.html" class="btn-secondary">Đăng Nhập</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="news-detail-main">
+        <div class="container">
+            <a href="index.html#news" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại tin tức</a>
+
+            <div id="newsLoading" class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Đang tải tin tức...</p>
+            </div>
+
+            <article id="newsContent" class="news-article" style="display:none;">
+                <div class="news-header">
+                    <h1 id="newsTitle">Tiêu đề tin tức</h1>
+                    <div class="news-meta">
+                        <span><i class="fas fa-calendar"></i> <span id="newsDate"></span></span>
+                        <span><i class="fas fa-user"></i> <span id="newsAuthor">Admin</span></span>
+                    </div>
+                </div>
+                <div class="news-image-wrapper">
+                    <img id="newsImage" src="" alt="Ảnh tin tức">
+                </div>
+                <div id="newsBody" class="news-body"></div>
+            </article>
+
+            <div id="errorState" class="error-state" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>Không tìm thấy tin tức</h3>
+                <p>Tin tức này không tồn tại hoặc đã bị xóa.</p>
+                <a href="index.html#news" class="btn btn-primary">Xem tin tức khác</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nanogeyser. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const BASE_URL = import.meta.env.VITE_API_URL;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            updateAuthNav();
+
+            // Lấy ID tin tức từ URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const newsId = urlParams.get('id');
+
+            if (newsId) {
+                loadNewsDetail(newsId);
+            } else {
+                showError();
+            }
+        });
+
+        function loadNewsDetail(id) {
+            console.log('Loading news ID:', id);
+            fetch(`/api/blog/${ id }`)
+                .then(res => res.json())
+                .then(result => {
+                    console.log('News detail API response:', result);
+                    document.getElementById('newsLoading').style.display = 'none';
+
+                    let news = null;
+
+                    // API trả về result.data.blog
+                    if (result.data && result.data.blog) {
+                        news = result.data.blog;
+                    } else if (result.data && typeof result.data === 'object') {
+                        if (Array.isArray(result.data)) {
+                            news = result.data[0];
+                        } else {
+                            news = result.data;
+                        }
+                    } else if (result.id || result.title || result.name) {
+                        news = result;
+                    }
+
+                    console.log('Parsed news:', news);
+
+                    if (news && (news.title || news.name || news.id)) {
+                        displayNews(news);
+                    } else {
+                        showError();
+                    }
+                })
+                .catch(err => {
+                    console.log('Error:', err);
+                    document.getElementById('newsLoading').style.display = 'none';
+                    showError();
+                });
+        }
+
+        function displayNews(news) {
+            document.getElementById('newsContent').style.display = 'block';
+
+            // Title
+            const title = news.title || news.name || 'Tin tức';
+            document.getElementById('newsTitle').textContent = title;
+            document.title = title + ' - Nanogeyser';
+
+            // Date
+            document.getElementById('newsDate').textContent = formatDate(news.created_at || news.date);
+
+            // Author
+            if (news.author || news.user_create) {
+                document.getElementById('newsAuthor').textContent = news.author || 'Admin';
+            }
+
+            // Image
+            let imageUrl = news.image || news.thumbnail || news.avatar || '';
+            if (imageUrl && !imageUrl.startsWith('http')) {
+                imageUrl = BASE_URL + imageUrl;
+            }
+            const imgEl = document.getElementById('newsImage');
+            if (imageUrl) {
+                imgEl.src = imageUrl;
+                imgEl.onerror = function () { this.src = '/public/images/logo.png'; };
+            } else {
+                imgEl.src = '/public/images/logo.png';
+            }
+
+            // Content - có thể là HTML
+            const content = news.content || news.des || news.description || news.text || '';
+            document.getElementById('newsBody').innerHTML = content;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function showError() {
+            document.getElementById('newsLoading').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        function updateAuthNav() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const authNav = document.getElementById('authNav');
+            if (currentUser && authNav) {
+                authNav.innerHTML = `
+                <div class="user-dropdown">
+                    <a href="#" class="user-btn">
+                        <i class="fas fa-user-circle"></i>
+                        <span>${ currentUser.username || currentUser.phone }</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="booking.html"><i class="fas fa-calendar-plus"></i> Đặt lịch</a>
+                        <a href="history-booking.html"><i class="fas fa-calendar-check"></i> Lịch sử đặt lịch</a>
+                        <a href="history-filter.html"><i class="fas fa-filter"></i> Nhật ký thay lõi</a>
+                        <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    </div>
+                </div>
+            `;
+            }
+        }
+
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                sessionStorage.clear();
+                window.location.href = './index.html';
+            }
+        }
+    </script>
+
+    <style>
+        .news-detail-main {
+            padding: 100px 0 60px;
+            min-height: 70vh;
+            background: #f8f9fa;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #28a745;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 25px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .loading-state,
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-state i,
+        .error-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .loading-state i {
+            color: #28a745;
+        }
+
+        .error-state i {
+            color: #dc3545;
+        }
+
+        .error-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .error-state p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .news-article {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .news-header {
+            padding: 30px 30px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .news-header h1 {
+            font-size: 1.8rem;
+            color: #1a1a2e;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .news-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .news-meta i {
+            color: #28a745;
+            margin-right: 5px;
+        }
+
+        .news-image-wrapper {
+            width: 100%;
+            max-height: 400px;
+            overflow: hidden;
+        }
+
+        .news-image-wrapper img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .news-body {
+            padding: 30px;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .news-body p {
+            margin-bottom: 15px;
+        }
+
+        .news-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .news-body h2,
+        .news-body h3 {
+            color: #1a1a2e;
+            margin: 25px 0 15px;
+        }
+
+        .news-body ul,
+        .news-body ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        .news-body li {
+            margin-bottom: 8px;
+        }
+
+        /* Dropdown styles */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            color: white !important;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            z-index: 9999;
+            margin-top: 5px;
+            padding: 8px 0;
+        }
+
+        .user-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333 !important;
+            text-decoration: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f5f5f5;
+            color: #28a745 !important;
+        }
+
+        .dropdown-menu a i {
+            width: 20px;
+            color: #28a745;
+        }
+
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .submenu {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 8px 0;
+            margin-left: 5px;
+        }
+
+        .dropdown-submenu:hover .submenu {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .news-header {
+                padding: 20px;
+            }
+
+            .news-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .news-body {
+                padding: 20px;
+            }
+
+            .news-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</body>
+
+</html>

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Lịch Hẹn - Nanogeyser</title>
+    <link rel="icon" href="./assets/logo-web-CIp09qxk.png" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/booking-Dc2ZJzR6.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/config-CAO_t3db.js">
+  <link rel="modulepreload" crossorigin href="./assets/data-DEhFnekE.js">
+  <link rel="stylesheet" crossorigin href="./assets/styles-DXe8NeaQ.css">
+</head>
+
+<body class="booking-page">
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="./assets/logo-BPhqW2iW.png" alt="Nanogeyser Logo">
+                    </a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Trang Chủ</a></li>
+                    <li><a href="booking.html">Đặt Lịch</a></li>
+                    <li><a href="index.html#warranty">Bảo Hành</a></li>
+                    <li><a href="index.html#contact">Liên Hệ</a></li>
+                    <li id="authNav"><a href="login.html" class="btn-secondary">Đăng Nhập</a></li>
+                    <li id="registerNav"><a href="register.html" class="btn-primary">Đăng Ký</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="booking-main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-calendar-plus"></i> Đặt Lịch Hẹn</h1>
+                <p>Đặt lịch bảo dưỡng, sửa chữa hoặc lắp đặt máy lọc nước Nanogeyser</p>
+                <div class="breadcrumb">
+                    <a href="index.html">Trang chủ</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Đặt lịch hẹn</span>
+                </div>
+            </div>
+
+            <!-- Service Selection -->
+            <div class="service-selection">
+                <h2>Chọn Dịch Vụ</h2>
+                <div id="servicesLoading" style="text-align:center; padding:40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:#28a745;"></i>
+                    <p style="margin-top:10px; color:#666;">Đang tải dịch vụ...</p>
+                </div>
+                <div class="service-cards" id="serviceCards" style="display:none;"></div>
+            </div>
+
+            <!-- Booking Form -->
+            <div class="booking-form-container" id="bookingFormContainer" style="display: none;">
+                <h2>Thông Tin Đặt Lịch</h2>
+                <form id="bookingForm" class="booking-form">
+                    <!-- Service Info -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-info-circle"></i> Dịch Vụ Đã Chọn</h3>
+                        <div class="selected-service">
+                            <div class="service-summary">
+                                <div class="service-name" id="selectedServiceName"></div>
+                                <div class="service-details" id="selectedServiceDetails"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Thông Tin Khách Hàng</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customerName">Họ và tên <span class="required">*</span></label>
+                                <input type="text" id="customerName" name="customerName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customerPhone">Số điện thoại <span class="required">*</span></label>
+                                <input type="tel" id="customerPhone" name="customerPhone" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customerEmail">Email</label>
+                                <input type="email" id="customerEmail" name="customerEmail">
+                            </div>
+                            <div class="form-group">
+                                <label for="customerAddress">Địa chỉ <span class="required">*</span></label>
+                                <input type="text" id="customerAddress" name="customerAddress" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-box"></i> Thông Tin Sản Phẩm</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="productModel">Model máy lọc nước</label>
+                                <select id="productModel" name="productModel">
+                                    <option value="">Đang tải sản phẩm...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="productSerial">Số serial (nếu có)</label>
+                                <input type="text" id="productSerial" name="productSerial"
+                                    placeholder="Ví dụ: NG001234">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchaseDate">Ngày mua (nếu có)</label>
+                            <input type="date" id="purchaseDate" name="purchaseDate">
+                        </div>
+                    </div>
+
+                    <!-- Appointment Details -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-calendar-alt"></i> Thời Gian Hẹn</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="appointmentDate">Ngày mong muốn <span class="required">*</span></label>
+                                <input type="date" id="appointmentDate" name="appointmentDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="appointmentTime">Khung giờ mong muốn <span class="required">*</span></label>
+                                <select id="appointmentTime" name="appointmentTime" required>
+                                    <option value="">Chọn khung giờ</option>
+                                    <option value="08:00-09:00">08:00 - 09:00</option>
+                                    <option value="09:00-10:00">09:00 - 10:00</option>
+                                    <option value="10:00-11:00">10:00 - 11:00</option>
+                                    <option value="11:00-12:00">11:00 - 12:00</option>
+                                    <option value="14:00-15:00">14:00 - 15:00</option>
+                                    <option value="15:00-16:00">15:00 - 16:00</option>
+                                    <option value="16:00-17:00">16:00 - 17:00</option>
+                                    <option value="17:00-18:00">17:00 - 18:00</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="urgency">Mức độ ưu tiên</label>
+                            <select id="urgency" name="urgency">
+                                <option value="normal">Bình thường</option>
+                                <option value="urgent">Khẩn cấp (phụ thu 20%)</option>
+                                <option value="emergency">Cấp cứu (phụ thu 50%)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Problem Description -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-clipboard-list"></i> Mô Tả Vấn Đề</h3>
+                        <div class="form-group">
+                            <label for="problemDescription">Mô tả chi tiết vấn đề hoặc yêu cầu</label>
+                            <textarea id="problemDescription" name="problemDescription" rows="4"
+                                placeholder="Ví dụ: Máy có tiếng ồn lạ, nước ra ít, cần thay lõi lọc..."></textarea>
+                        </div>
+                        <div class="problem-options">
+                            <label>Các vấn đề thường gặp:</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="commonIssues" value="low-pressure">
+                                    <span>Áp lực nước yếu</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="commonIssues" value="strange-noise">
+                                    <span>Tiếng ồn bất thường</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="commonIssues" value="water-taste">
+                                    <span>Nước có vị lạ</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="commonIssues" value="filter-change">
+                                    <span>Cần thay lõi lọc</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="commonIssues" value="leak">
+                                    <span>Rò rỉ nước</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="commonIssues" value="no-water">
+                                    <span>Không ra nước</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Services -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-plus-circle"></i> Dịch Vụ Bổ Sung</h3>
+                        <div class="additional-services">
+                            <label class="service-addon">
+                                <input type="checkbox" name="additionalServices" value="water-test">
+                                <div class="addon-info">
+                                    <span class="addon-name">Kiểm tra chất lượng nước</span>
+                                    <span class="addon-price">+100.000 VND</span>
+                                </div>
+                            </label>
+                            <label class="service-addon">
+                                <input type="checkbox" name="additionalServices" value="system-upgrade">
+                                <div class="addon-info">
+                                    <span class="addon-name">Tư vấn nâng cấp hệ thống</span>
+                                    <span class="addon-price">Miễn phí</span>
+                                </div>
+                            </label>
+                            <label class="service-addon">
+                                <input type="checkbox" name="additionalServices" value="maintenance-plan">
+                                <div class="addon-info">
+                                    <span class="addon-name">Đăng ký gói bảo dưỡng định kỳ</span>
+                                    <span class="addon-price">Giảm 15%</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Cost Estimate -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-calculator"></i> Ước Tính Chi Phí</h3>
+                        <div class="cost-breakdown">
+                            <div class="cost-item">
+                                <span>Dịch vụ chính:</span>
+                                <span id="baseCost">0 VND</span>
+                            </div>
+                            <div class="cost-item">
+                                <span>Dịch vụ bổ sung:</span>
+                                <span id="addonCost">0 VND</span>
+                            </div>
+                            <div class="cost-item">
+                                <span>Phụ thu (nếu có):</span>
+                                <span id="urgencyCost">0 VND</span>
+                            </div>
+                            <div class="cost-total">
+                                <span>Tổng ước tính:</span>
+                                <span id="totalCost">0 VND</span>
+                            </div>
+                            <p class="cost-note">
+                                <i class="fas fa-info-circle"></i>
+                                Chi phí cuối cùng có thể thay đổi tùy theo tình trạng thực tế
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-section">
+                        <div class="terms-conditions">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                                <span>Tôi đồng ý với <a href="#" onclick="showTerms()">điều khoản dịch vụ</a> và <a
+                                        href="#" onclick="showPrivacy()">chính sách bảo mật</a></span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="confirmInfo" name="confirmInfo" required>
+                                <span>Tôi xác nhận thông tin trên là chính xác</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            <i class="fas fa-undo"></i> Làm Lại
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Đặt Lịch Hẹn
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="contact-info">
+                <h2>Cần Hỗ Trợ?</h2>
+                <div class="contact-methods">
+                    <div class="contact-method">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h4>Hotline 24/7</h4>
+                            <p>038 690 2668</p>
+                        </div>
+                    </div>
+                    <div class="contact-method">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <p>nanogeyser29@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-method">
+                        <i class="fas fa-comments"></i>
+                        <div>
+                            <h4>Chat Online</h4>
+                            <p>Hỗ trợ trực tuyến</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Nanogeyser</h3>
+                    <p>Chuyên cung cấp dịch vụ bảo hành và bảo dưỡng máy lọc nước chuyên nghiệp, uy tín hàng đầu Việt
+                        Nam.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Dịch Vụ</h4>
+                    <ul>
+                        <li><a href="#services">Bảo dưỡng định kỳ</a></li>
+                        <li><a href="#services">Sửa chữa bảo hành</a></li>
+                        <li><a href="#services">Lắp đặt mới</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Liên Hệ</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> 038 690 2668</li>
+                        <li><i class="fas fa-envelope"></i> nanogeyser29@gmail.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> CTT1 - 03, Khu Biệt Thự Liền kề Kiến Hưng Luxury, Hà
+                            Đông, Hà Nội</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nanogeyser. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Terms Modal -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Điều Khoản Dịch Vụ</h3>
+                <span class="close" onclick="closeModal('termsModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h4>1. Điều khoản chung</h4>
+                <p>Khi sử dụng dịch vụ của Nanogeyser, quý khách đồng ý tuân thủ các điều khoản sau...</p>
+
+                <h4>2. Quy định về lịch hẹn</h4>
+                <p>- Lịch hẹn có thể được thay đổi trước 24 giờ</p>
+                <p>- Phí hủy lịch áp dụng nếu hủy trong vòng 2 giờ trước giờ hẹn</p>
+
+                <h4>3. Chính sách bảo hành</h4>
+                <p>- Bảo hành áp dụng theo chính sách của từng sản phẩm</p>
+                <p>- Không bảo hành cho lỗi do người dùng</p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Service cards grid - Premium Design */
+        .service-selection {
+            padding: 60px 0;
+        }
+
+        .service-selection h2 {
+            text-align: center;
+            font-size: 2.2rem;
+            color: #1a1a2e;
+            margin-bottom: 50px;
+            font-weight: 700;
+        }
+
+        .service-cards {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 25px;
+        }
+
+        .service-option {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 28px;
+            padding: 40px 25px 35px;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #28a745, #34ce57, #7ed957);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .service-option::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(40, 167, 69, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .service-option:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-option:hover::after {
+            opacity: 1;
+        }
+
+        .service-option:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 70px rgba(40, 167, 69, 0.2);
+        }
+
+        .service-option .service-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            position: relative;
+            transition: all 0.4s;
+            z-index: 1;
+        }
+
+        .service-option:hover .service-icon {
+            background: linear-gradient(145deg, #28a745, #34ce57);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 15px 35px rgba(40, 167, 69, 0.3);
+        }
+
+        .service-option .service-icon i {
+            font-size: 2.5rem;
+            color: #28a745;
+            transition: all 0.4s;
+        }
+
+        .service-option:hover .service-icon i {
+            color: white;
+        }
+
+        .service-option h3 {
+            font-size: 1.1rem;
+            color: #1a1a2e;
+            margin-bottom: 15px;
+            min-height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            line-height: 1.4;
+            position: relative;
+            z-index: 1;
+        }
+
+        .service-option .service-type {
+            font-size: 0.75rem;
+            color: #28a745;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            padding: 8px 18px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 22px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .service-option .btn-outline {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 0.9rem;
+            border: none;
+            background: linear-gradient(135deg, #f0f0f0, #e5e5e5);
+            color: #28a745;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .service-option:hover .btn-outline {
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            color: white;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .service-cards {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 25px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .service-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .service-option {
+                padding: 35px 20px 30px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .service-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* User dropdown styles */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            color: white !important;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .user-btn:hover {
+            background: linear-gradient(135deg, #218838, #28a745);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            overflow: visible;
+            z-index: 9999;
+            margin-top: 5px;
+            padding: 8px 0;
+        }
+
+        .user-dropdown::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            height: 10px;
+        }
+
+        .user-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333 !important;
+            text-decoration: none;
+            transition: background 0.2s;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f5f5f5;
+            color: #28a745 !important;
+        }
+
+        .dropdown-menu a i {
+            width: 20px;
+            color: #28a745;
+        }
+
+        .nav-menu {
+            overflow: visible !important;
+        }
+
+        #authNav {
+            position: relative;
+            z-index: 100;
+        }
+    </style>
+</body>
+
+</html>

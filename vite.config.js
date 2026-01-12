@@ -6,7 +6,7 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://mobile.chothuetatca.com',
+        target: process.env.VITE_API_URL,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api')
       }

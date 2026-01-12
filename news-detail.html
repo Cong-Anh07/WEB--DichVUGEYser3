@@ -67,7 +67,7 @@
 
     <script src="/src/js/config.js"></script>
     <script>
-    const BASE_URL = 'http://mobile.chothuetatca.com/';
+    const BASE_URL = import.meta.env.VITE_API_URL;
 
     document.addEventListener('DOMContentLoaded', function() {
         updateAuthNav();

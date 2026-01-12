@@ -286,7 +286,7 @@
             return;
         }
         
-        const baseUrl = 'http://mobile.chothuetatca.com/';
+        const baseUrl = import.meta.env.VITE_API_URL;
         
         container.innerHTML = news.map(item => {
             // Xử lý đường dẫn ảnh
